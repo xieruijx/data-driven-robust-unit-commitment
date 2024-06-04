@@ -5,6 +5,7 @@ class C032(object):
     """
     C032 class for weight calculation
     """
+    
     @staticmethod
     def combine_predict(type_data, num_groups, weight):
         """
