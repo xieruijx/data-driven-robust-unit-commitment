@@ -74,6 +74,10 @@ for i in range(num_wind):
     df_validation['wind' + str(i) + '_real'] = df_renewable['wind' + str(i) + '_real'][period_status == 2]
     df_test['wind' + str(i) + '_real'] = df_renewable['wind' + str(i) + '_real'][period_status == 3]
 
+    df_train['wind' + str(i) + '_predict'] = df_renewable['wind' + str(i) + '_predict'][period_status == 1]
+    df_validation['wind' + str(i) + '_predict'] = df_renewable['wind' + str(i) + '_predict'][period_status == 2]
+    df_test['wind' + str(i) + '_predict'] = df_renewable['wind' + str(i) + '_predict'][period_status == 3]
+
 ## Output prediction data
 df_train.to_csv('./data/processed/combination/d031_train.csv', index=False)
 df_validation.to_csv('./data/processed/combination/d031_validation.csv', index=False)
