@@ -7,7 +7,7 @@ class C032(object):
     """
     
     @staticmethod
-    def combine_predict(type_data, num_groups, weight):
+    def combine_predict(type_data, num_groups, num_wind, weight):
         """
         Use the weight to generate the combined prediction
         """
@@ -19,10 +19,9 @@ class C032(object):
         for group in range(num_groups):
             df_new['load' + str(group) + '_real'] = df['load' + str(group) + '_real']
             df_new['load' + str(group) + '_predict'] = np.concatenate((df['load' + str(group) + '_local'].to_numpy().reshape((-1, 1)), df['load' + str(group) + '_HFL'].to_numpy().reshape((-1, 1)), df['load' + str(group) + '_VFL'].to_numpy().reshape((-1, 1))), axis=1) @ weight
-        df_new['wind1_real'] = df['wind1_real']
-        df_new['wind1_predict'] = df['wind1_predict']
-        df_new['wind2_real'] = df['wind2_real']
-        df_new['wind2_predict'] = df['wind2_predict']
+        for i in range(num_wind):
+            df_new['wind' + str(i) + '_real'] = df['wind' + str(i) + '_real']
+            df_new['wind' + str(i) + '_predict'] = df['wind' + str(i) + '_predict']
 
         return df_new
     
@@ -58,7 +57,7 @@ class C032(object):
         return error_bounds
     
     @staticmethod
-    def c032_calculate_weight(num_groups, weight):
+    def c032_calculate_weight(num_groups, num_wind, weight):
         """
         Calculate the optimized weight by formula and then output combined predictions and errors
         """
@@ -67,15 +66,15 @@ class C032(object):
         c032 = C032()
 
         ## Combine prediction and calculate MSE
-        df_train = c032.combine_predict('train', num_groups, weight)
-        df_train_n1 = c032.combine_predict('train_n1', num_groups, weight)
-        df_train_n2 = c032.combine_predict('train_n2', num_groups, weight)
-        df_validation = c032.combine_predict('validation', num_groups, weight)
-        df_test = c032.combine_predict('test', num_groups, weight)
+        df_train = c032.combine_predict('train', num_groups, num_wind, weight)
+        df_train_n1 = c032.combine_predict('train_n1', num_groups, num_wind, weight)
+        df_train_n2 = c032.combine_predict('train_n2', num_groups, num_wind, weight)
+        df_validation = c032.combine_predict('validation', num_groups, num_wind, weight)
+        df_test = c032.combine_predict('test', num_groups, num_wind, weight)
 
         ## Transform dataframes into matrices. Columns are load0-load20, wind1, wind2. Rows are periods.
         list_name = ['load' + str(i) for i in range(num_groups)]
-        list_name.extend(['wind1', 'wind2'])
+        list_name.extend(['wind' + str(i) for i in range(num_wind)])
         train_real, train_predict = c032.df2matrix(df_train, list_name)
         train_n1_real, train_n1_predict = c032.df2matrix(df_train_n1, list_name)
         train_n2_real, train_n2_predict = c032.df2matrix(df_train_n2, list_name)

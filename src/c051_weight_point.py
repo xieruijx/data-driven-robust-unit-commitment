@@ -12,6 +12,7 @@ parameter = {}
 parameter['type_r'] = 'n1' # type_r: 'n1' max in n1; 'n2' quantile in n2; 'n_m' max in n1 and n2; 'n_q' quantile in n1 and n2
 parameter['b_display_SP'] = False
 parameter['num_groups'] = 21
+parameter['num_wind'] = 4
 parameter['horizon'] = 24
 parameter['epsilon'] = 0.05 # chance constraint parameter
 parameter['delta'] = 0.05 # probability guarantee parameter
@@ -24,7 +25,7 @@ parameter['EPS'] = 1e-8 # A small number for margin
 parameter['u_select'] = [False, True, True, False, False, False, True,
             False, True, True, True, True, True, True,
             True, False, True, True, True, True, False,
-            True, True] # Only a part of loads and renewables are uncertain
+            True, True, False, False] # Only a part of loads and renewables are uncertain
 
 index_u_l_predict = 9
 

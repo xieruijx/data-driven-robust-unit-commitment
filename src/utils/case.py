@@ -93,16 +93,11 @@ class Case(object):
         bus_uncertain_load = [2, 3, 4, 5, 7, 8, 10,
                            12, 14, 15, 16, 17, 18, 19,
                            20, 21, 23, 24, 26, 29, 30]
-        bus_uncertain_wind = [11, 13]
+        bus_uncertain_wind = [6, 10, 12, 24]
         mpc['bus_uncertain'] = bus_uncertain_load + bus_uncertain_wind
-        if parameter is None:
-            mpc['u_select'] = [False, True, True, False, False, False, True,
-                                False, True, True, True, True, True, True,
-                                True, False, True, True, True, True, False,
-                                True, True] # Only a part (16/23) of loads and renewables are uncertain
-        else:
-            mpc['u_select'] = parameter['u_select']
-        bus_uncertain_load = [b for b, u in zip(bus_uncertain_load, mpc['u_select'][:21]) if u]
+        mpc['u_select'] = parameter['u_select']
+        bus_uncertain_load = [b for b, u in zip(bus_uncertain_load, mpc['u_select'][:len(bus_uncertain_load)]) if u]
+        bus_uncertain_wind = [b for b, u in zip(bus_uncertain_wind, mpc['u_select'][-len(bus_uncertain_wind):]) if u]
         mpc['bus_uncertain'] = [b for b, u in zip(mpc['bus_uncertain'], mpc['u_select']) if u]
         mpc['n_u'] = len(mpc['bus_uncertain']) # Number of uncertainties
 
@@ -110,24 +105,14 @@ class Case(object):
         for i in range(len(bus_uncertain_load)):
             times_uncertain_load[i] = mpc['bus'][bus_uncertain_load[i] - 1, 2] / mpc['baseMVA']
             mpc['bus'][bus_uncertain_load[i] - 1, 2] = 0
-        times_uncertain_wind = np.array([-10, -20]) / mpc['baseMVA']
+        times_uncertain_wind = - 10 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
         mpc['times_uncertain'] = np.concatenate((times_uncertain_load, times_uncertain_wind))
 
-        if parameter is None:
-            #   prediction
-            mpc['u_l_predict'] = np.load('./data/processed/combination/d032_predict_test.npy')[:mpc['n_t'], mpc['u_select']].reshape((-1,))
-
-            #   uncertainty set
-            mpc['error_mu'] = np.load('./data/processed/uncertainty/d041_mu.npy')
-            mpc['error_sigma_inv'] = np.linalg.inv(np.load('./data/processed/uncertainty/d041_sigma.npy')) # The inverse matrix of sigma
-            mpc['error_rho'] = np.load('./data/processed/uncertainty/d041_radius.npy')
-            error_bounds = np.load('./data/processed/uncertainty/d032_error_bounds.npy') # [lb, ub]
-        else:
-            mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
-            mpc['error_mu'] = parameter['error_mu']
-            mpc['error_sigma_inv'] = np.linalg.inv(parameter['error_sigma'])
-            mpc['error_rho'] = parameter['error_rho']
-            error_bounds = parameter['error_bounds']
+        mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
+        mpc['error_mu'] = parameter['error_mu']
+        mpc['error_sigma_inv'] = np.linalg.inv(parameter['error_sigma'])
+        mpc['error_rho'] = parameter['error_rho']
+        error_bounds = parameter['error_bounds']
         error_bounds = error_bounds[mpc['u_select']]
         lb = np.ones((mpc['n_t'], 1)) @ error_bounds[:, 0].reshape((1, -1))
         mpc['error_lb'] = lb.reshape((-1,))
@@ -202,13 +187,7 @@ class Case(object):
                            51, 52, 57, 58, 72, 73, 84]
         bus_uncertain_wind = [70, 90]
         mpc['bus_uncertain'] = bus_uncertain_load + bus_uncertain_wind
-        if parameter is None:
-            mpc['u_select'] = [True, True, True, True, True, True, True,
-                                True, True, True, True, True, True, True,
-                                True, True, True, True, True, True, True,
-                                True, True] # Only a part (23/23) of loads and renewables are uncertain
-        else:
-            mpc['u_select'] = parameter['u_select']
+        mpc['u_select'] = parameter['u_select']
         bus_uncertain_load = [b for b, u in zip(bus_uncertain_load, mpc['u_select'][:21]) if u]
         mpc['bus_uncertain'] = [b for b, u in zip(mpc['bus_uncertain'], mpc['u_select']) if u]
         mpc['n_u'] = len(mpc['bus_uncertain']) # Number of uncertainties
@@ -220,21 +199,11 @@ class Case(object):
         times_uncertain_wind = np.array([-90, -80]) / mpc['baseMVA']
         mpc['times_uncertain'] = np.concatenate((times_uncertain_load, times_uncertain_wind))
 
-        if parameter is None:
-            #   prediction
-            mpc['u_l_predict'] = np.load('./data/processed/combination/d032_predict_test.npy')[:mpc['n_t'], mpc['u_select']].reshape((-1,))
-
-            #   uncertainty set
-            mpc['error_mu'] = np.load('./data/processed/uncertainty/d041_mu.npy')
-            mpc['error_sigma_inv'] = np.linalg.inv(np.load('./data/processed/uncertainty/d041_sigma.npy')) # The inverse matrix of sigma
-            mpc['error_rho'] = np.load('./data/processed/uncertainty/d041_radius.npy')
-            error_bounds = np.load('./data/processed/uncertainty/d032_error_bounds.npy') # [lb, ub]
-        else:
-            mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
-            mpc['error_mu'] = parameter['error_mu']
-            mpc['error_sigma_inv'] = np.linalg.inv(parameter['error_sigma'])
-            mpc['error_rho'] = parameter['error_rho']
-            error_bounds = parameter['error_bounds']
+        mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
+        mpc['error_mu'] = parameter['error_mu']
+        mpc['error_sigma_inv'] = np.linalg.inv(parameter['error_sigma'])
+        mpc['error_rho'] = parameter['error_rho']
+        error_bounds = parameter['error_bounds']
         error_bounds = error_bounds[mpc['u_select']]
         lb = np.ones((mpc['n_t'], 1)) @ error_bounds[:, 0].reshape((1, -1))
         mpc['error_lb'] = lb.reshape((-1,))
