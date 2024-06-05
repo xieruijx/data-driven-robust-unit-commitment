@@ -333,14 +333,6 @@ class Case(object):
         Revise a solution that is not in the ellipsoid uncertainty set to be in the uncertainty set
         """
         print('Revise uncertainty.')
-        # bounds of uncertainty
-        su = np.minimum(su, mpc['u_lu'] - EPS * EPS)
-        su = np.maximum(su, mpc['u_ll'] + EPS * EPS)
-        # bounds of error
-        error = mpc['u_l_predict'] - su
-        error = np.minimum(error, mpc['error_ub'] - EPS * EPS)
-        error = np.maximum(error, mpc['error_lb'] + EPS * EPS)
-        su = mpc['u_l_predict'] - error
         # quadratic
         if b_ellipsoid:
             u_ld = mpc['u_l_predict'] - su - mpc['error_mu']
@@ -348,6 +340,14 @@ class Case(object):
             if quadratic > mpc['error_rho']:
                 u_ld = u_ld / np.sqrt(quadratic / mpc['error_rho'])
                 su = mpc['u_l_predict'] - u_ld - mpc['error_mu']
+        # bounds of error
+        error = mpc['u_l_predict'] - su
+        error = np.minimum(error, mpc['error_ub'] - EPS * EPS)
+        error = np.maximum(error, mpc['error_lb'] + EPS * EPS)
+        su = mpc['u_l_predict'] - error
+        # bounds of uncertainty
+        su = np.minimum(su, mpc['u_lu'] - EPS * EPS)
+        su = np.maximum(su, mpc['u_ll'] + EPS * EPS)
         # Test
         if b_print:
             print('test_u in revise_u')

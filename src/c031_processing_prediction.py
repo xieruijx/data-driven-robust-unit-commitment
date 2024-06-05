@@ -18,7 +18,7 @@ num_data = num_rows // horizon
 input_day = sequence_length // horizon - 1
 n2 = num_data - input_day - n1 - n_validation - n_test
 
-## Labels for deviding data
+## Labels for dividing data
 day_status = np.zeros((num_data,))
 # 1: train
 # 2: validation !!! not the same as that in forecasting

@@ -40,6 +40,14 @@ class C042(object):
                 num_not_in_uncertainty_set += 1
         print('{} out of {} data are not in the ellipsoid uncertainty set.'.format(num_not_in_uncertainty_set, num_data))
         
+        if b_ellipsoid:
+            if num_not_in_uncertainty_set > 0:
+                raise RuntimeError('Failure of uncertainty revision')
+        else:
+            for i in range(num_data):
+                if not case.test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=False):
+                    raise RuntimeError('Failure of uncertainty revision')
+
         return u_data
     
     @staticmethod
