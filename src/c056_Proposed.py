@@ -12,6 +12,7 @@ parameter = {}
 parameter['type_r'] = 'n1' # type_r: 'n1' max in n1; 'n2' quantile in n2; 'n_m' max in n1 and n2; 'n_q' quantile in n1 and n2
 parameter['b_display_SP'] = False
 parameter['num_groups'] = 21
+parameter['num_wind'] = 4
 parameter['horizon'] = 24
 parameter['epsilon'] = 0.05 # chance constraint parameter
 parameter['delta'] = 0.05 # probability guarantee parameter
@@ -24,12 +25,13 @@ parameter['EPS'] = 1e-8 # A small number for margin
 parameter['u_select'] = [False, True, True, False, False, False, True,
             False, True, True, True, True, True, True,
             True, False, True, True, True, True, False,
-            True, True] # Only a part of loads and renewables are uncertain
+            True, True, False, False] # Only a part of loads and renewables are uncertain
 
-index_u_l_predict = 9
+index_u_l_predict = 0
 
 ## Set weight as the optimized one
-weight = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
+# weight = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
+weight = np.loadtxt('./data/processed/combination/d032_weight.txt')
 np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_weight_Proposed.txt', weight)
 validation_cost, test_cost, sxb1, sxc1, LBUB1, time1, sxb2, sxc2, LBUB2, time2, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight, index_u_l_predict)
 cost = np.concatenate((validation_cost.reshape((-1, 1)), test_cost.reshape((-1, 1))), axis=1)
