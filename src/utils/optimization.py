@@ -1086,7 +1086,7 @@ class Optimization(object):
         """
         optimization = Optimization()
 
-        b_use_n2 = parameter['b_use_n2']
+        type_r = parameter['type_r']
         b_display_SP = parameter['b_display_SP']
         num_groups = parameter['num_groups']
         horizon = parameter['horizon']
@@ -1101,7 +1101,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
@@ -1139,7 +1139,7 @@ class Optimization(object):
         """
         optimization = Optimization()
 
-        b_use_n2 = parameter['b_use_n2']
+        type_r = parameter['type_r']
         b_display_SP = parameter['b_display_SP']
         num_groups = parameter['num_groups']
         horizon = parameter['horizon']
@@ -1154,7 +1154,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
@@ -1198,7 +1198,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty_RO(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
@@ -1227,7 +1227,7 @@ class Optimization(object):
         """
         optimization = Optimization()
 
-        b_use_n2 = parameter['b_use_n2']
+        type_r = parameter['type_r']
         b_display_SP = parameter['b_display_SP']
         num_groups = parameter['num_groups']
         horizon = parameter['horizon']
@@ -1242,7 +1242,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
@@ -1266,7 +1266,7 @@ class Optimization(object):
         """
         optimization = Optimization()
 
-        b_use_n2 = parameter['b_use_n2']
+        type_r = parameter['type_r']
         b_display_SP = parameter['b_display_SP']
         num_groups = parameter['num_groups']
         horizon = parameter['horizon']
@@ -1281,7 +1281,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
@@ -1303,7 +1303,7 @@ class Optimization(object):
         """
         optimization = Optimization()
 
-        b_use_n2 = parameter['b_use_n2']
+        type_r = parameter['type_r']
         b_display_SP = parameter['b_display_SP']
         num_groups = parameter['num_groups']
         horizon = parameter['horizon']
@@ -1318,7 +1318,7 @@ class Optimization(object):
         u_select = parameter['u_select']
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, weight)
-        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = optimization.c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 

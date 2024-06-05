@@ -9,9 +9,10 @@ class C041(object):
     """
 
     @staticmethod
-    def c041_initial_uncertainty(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict):
+    def c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict):
         """
         Calculate the first uncertainty set
+        type_r: 'n1' max in n1; 'n2' quantile in n2; 'n_m' max in n1 and n2; 'n_q' quantile in n1 and n2
         """
         print('(((((((((((((((((((((((((((((c041)))))))))))))))))))))))))))))')
 
@@ -33,75 +34,53 @@ class C041(object):
 
         dim_uncertainty = error_n1.shape[1]
 
-        ## Calculate mean and covariance
-        mu = error_n1.mean(axis=0)
-        derror_n1 = error_n1 - np.ones((n1, 1)) @ mu.reshape((1, -1))
-        derror_n2 = error_n2 - np.ones((n2, 1)) @ mu.reshape((1, -1))
-        sigma0 = derror_n1.T @ derror_n1 / (n1 - 1)
-        sigma = np.zeros((sigma0.shape))
-        if np.linalg.matrix_rank(sigma0) < dim_uncertainty:
-            for i in range(dim_uncertainty // horizon):
-                sigma[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)] = sigma0[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)]
-        else:
-            sigma = sigma0
+        if type_r == 'n1' or type_r == 'n2':
+            ## Calculate mean and covariance
+            mu = error_n1.mean(axis=0)
+            derror_n1 = error_n1 - np.ones((n1, 1)) @ mu.reshape((1, -1))
+            derror_n2 = error_n2 - np.ones((n2, 1)) @ mu.reshape((1, -1))
+            sigma0 = derror_n1.T @ derror_n1 / (n1 - 1)
+            sigma = np.zeros((sigma0.shape))
+            if np.linalg.matrix_rank(sigma0) < dim_uncertainty:
+                for i in range(dim_uncertainty // horizon):
+                    sigma[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)] = sigma0[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)]
+            else:
+                sigma = sigma0
 
-        ## Find radius
-        rho_n1 = np.diagonal(derror_n1 @ np.linalg.solve(sigma, derror_n1.T))
-        radius_n1 = np.max(rho_n1)
-        print('Radius n1: {}'.format(radius_n1))
-        rho_n2 = np.diagonal(derror_n2 @ np.linalg.solve(sigma, derror_n2.T))
-        rank_n2 = CombHandler().get_rank(n2, epsilon, delta)
-        radius_n2 = rho_n2[np.argsort(rho_n2)[rank_n2 - 1]]
-        print('Radius n2: {}'.format(radius_n2))
-
-        if b_use_n2:
-            radius = radius_n2 * 1.001
+            ## Find radius
+            if type_r == 'n1':
+                rho = np.diagonal(derror_n1 @ np.linalg.solve(sigma, derror_n1.T))
+                radius = np.max(rho)
+            else:
+                rho = np.diagonal(derror_n2 @ np.linalg.solve(sigma, derror_n2.T))
+                rank = CombHandler().get_rank(n2, epsilon, delta)
+                radius = rho[np.argsort(rho)[rank - 1]]
         else:
-            radius = radius_n1
-        print('Radius: {}'.format(radius))
+            error = np.concatenate((error_n1, error_n2), axis=0)
+            n = n1 + n2
+
+            ## Calculate mean and covariance
+            mu = error.mean(axis=0)
+            derror = error - np.ones((n, 1)) @ mu.reshape((1, -1))
+            sigma0 = derror.T @ derror / (n - 1)
+            sigma = np.zeros((sigma0.shape))
+            if np.linalg.matrix_rank(sigma0) < dim_uncertainty:
+                for i in range(dim_uncertainty // horizon):
+                    sigma[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)] = sigma0[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)]
+            else:
+                sigma = sigma0
+            rho = np.diagonal(derror_n1 @ np.linalg.solve(sigma, derror_n1.T))
+
+            ## Find radius
+            if type_r == 'n_m':
+                radius = np.max(rho)
+            elif type_r == 'n_q':
+                rank = np.ceil((1 - epsilon) * n).astype(int)
+                radius = rho[np.argsort(rho)[rank - 1]]
+            else:
+                print('The type of radius is wrong.')
+                return None, None, None
+        print('Radius: {} (type: {})'.format(radius, type_r))
 
         return mu, sigma, radius
     
-    @staticmethod
-    def c041_initial_uncertainty_RO(b_use_n2, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict):
-        """
-        Calculate the first uncertainty set
-        """
-        print('((((((((((((((((((((((((((((c041-RO))))))))))))))))))))))))))))')
-
-        ## Select uncertain load and renewable
-        train_n1_real = train_n1_real[:, u_select]
-        train_n1_predict = train_n1_predict[:, u_select]
-        train_n2_real = train_n2_real[:, u_select]
-        train_n2_predict = train_n2_predict[:, u_select]
-        train_real = np.concatenate((train_n1_real, train_n2_real), axis=0)
-        train_predict = np.concatenate((train_n1_predict, train_n2_predict), axis=0)
-
-        error = train_predict - train_real
-
-        ## Reshape into each sample
-        n = train_real.shape[0] // horizon
-
-        error = error.reshape((n, -1))
-
-        dim_uncertainty = error.shape[1]
-
-        ## Calculate mean and covariance
-        mu = error.mean(axis=0)
-        derror = error - np.ones((n, 1)) @ mu.reshape((1, -1))
-        sigma0 = derror.T @ derror / (n - 1)
-        sigma = np.zeros((sigma0.shape))
-        if np.linalg.matrix_rank(sigma0) < dim_uncertainty:
-            for i in range(dim_uncertainty // horizon):
-                sigma[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)] = sigma0[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)]
-        else:
-            sigma = sigma0
-
-        ## Find radius
-        rho = np.diagonal(derror @ np.linalg.solve(sigma, derror.T))
-        # rank = np.ceil((1 - epsilon) * n).astype(int)
-        # radius = rho[np.argsort(rho)[rank - 1]]
-        radius = np.max(rho)
-        print('Radius: {}'.format(radius))
-
-        return mu, sigma, radius

@@ -11,7 +11,7 @@ optimization = Optimization()
 name_case = 'case118'
 
 parameter = {}
-parameter['b_use_n2'] = False # False: the radius is the largest one in n1. True: the radius is the rank one in n2.
+parameter['type_r'] = 'n1' # type_r: 'n1' max in n1; 'n2' quantile in n2; 'n_m' max in n1 and n2; 'n_q' quantile in n1 and n2
 parameter['b_display_SP'] = False
 parameter['num_groups'] = 21
 parameter['horizon'] = 24
