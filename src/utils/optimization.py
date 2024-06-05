@@ -48,16 +48,16 @@ class Optimization(object):
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
             _, u_data, coefficients = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
             _, _, sxb2, sxc2, LBUB2, time2, interpret = C045().c045_CCG_n2(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data)
-            validation_cost = C046().c046_evaluate(u_data_validation, coefficients, sxb2, sxc2, LBUB2)
-            test_cost = C046().c046_evaluate(u_data_test, coefficients, sxb2, sxc2, LBUB2)
-            train_cost = C046().c046_evaluate_order(u_data_train_original, coefficients, sxb2, sxc2, LBUB2)
+            validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb2, sxc2, LBUB2)
+            test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb2, sxc2, LBUB2)
+            train_cost = C046().c046_evaluate_faster(u_data_train_original, coefficients, sxb2, sxc2, LBUB2, b_sort=False)
         else:
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
             _, u_data, coefficients = C044().c044_reconstruction_faster(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
             _, _, sxb2, sxc2, LBUB2, time2, interpret = C045().c045_CCG_n2_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data)
             validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb2, sxc2, LBUB2)
             test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb2, sxc2, LBUB2)
-            train_cost = C046().c046_evaluate_faster_order(u_data_train_original, coefficients, sxb2, sxc2, LBUB2)
+            train_cost = C046().c046_evaluate_faster(u_data_train_original, coefficients, sxb2, sxc2, LBUB2, b_sort=False)
         train_order = np.argsort(train_cost)
 
         print('Calculated bound: {}'.format(LBUB2[-1, 0]))
@@ -97,8 +97,8 @@ class Optimization(object):
         # test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
         if name_case == 'case_ieee30':
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
-            validation_cost = C046().c046_evaluate(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
-            test_cost = C046().c046_evaluate(u_data_test, coefficients, sxb1, sxc1, LBUB1)
+            validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
+            test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
         else:
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
             validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
@@ -141,8 +141,8 @@ class Optimization(object):
         # test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
         if name_case == 'case_ieee30':
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
-            validation_cost = C046().c046_evaluate(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
-            test_cost = C046().c046_evaluate(u_data_test, coefficients, sxb1, sxc1, LBUB1)
+            validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
+            test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
         else:
             _, sxb1, sxc1, LBUB1, time1 = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
             validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
@@ -257,8 +257,8 @@ class Optimization(object):
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = C042().c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
         sxb1, sxc1, LBUB1, time1 = C043().c043_SP(epsilon, LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
-        validation_cost = C046().c046_evaluate(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
-        test_cost = C046().c046_evaluate(u_data_test, coefficients, sxb1, sxc1, LBUB1)
+        validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
+        test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
 
         print('Calculated bound: {}'.format(LBUB1[-1, 0]))
         print('Validation bound:')

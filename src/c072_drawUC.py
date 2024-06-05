@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-index_u_l_predict = 9
-index_unit = 0
+index_u_l_predict = 0
+index_unit = 3
 
 x_og = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_og_Proposed.txt')
 x_pg = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_pg_Proposed.txt')
