@@ -7,6 +7,7 @@ from utils.c043_CCG_ellipsoid import C043
 from utils.c044_reconstruction import C044
 from utils.c045_CCG_polyhedron import C045
 from utils.c046_evaluation import C046
+from utils.c047_SP_enumeration import C047
 
 class Optimization(object):
     """
@@ -157,7 +158,7 @@ class Optimization(object):
     @staticmethod
     def weight2cost_dataRO(num_list, parameter, weight, index_u_l_predict=0, name_case='case_ieee30'):
         """
-        Combine c032, c041-c043, c046
+        Combine c032, c041, c042, c047, c046
         """
 
         type_r = parameter['type_r']
@@ -182,7 +183,7 @@ class Optimization(object):
 
         u_data_train_original = u_data_train_original[num_list, :]
 
-        sxb1, sxc1, LBUB1, time1 = C043().c043_list(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train_original, b_display_SP)
+        sxb1, sxc1, LBUB1, time1 = C047().c047_approx(u_data_train_original.shape[0], MaxIter, coefficients, u_data_train_original)
 
         validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
         test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
@@ -196,7 +197,7 @@ class Optimization(object):
     @staticmethod
     def weight2cost_SPapprox(parameter, weight, index_u_l_predict=0, name_case='case_ieee30'):
         """
-        Combine c032, c041-c043, c046
+        Combine c032, c041, c042, c047, c046
         """
 
         type_r = parameter['type_r']
@@ -219,7 +220,7 @@ class Optimization(object):
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = C042().c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
-        sxb1, sxc1, LBUB1, time1 = C043().c043_list_approx(epsilon, LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train_original, b_display_SP)
+        sxb1, sxc1, LBUB1, time1 = C047().c047_approx(np.ceil((1 - epsilon) * u_data_train_original.shape[0]).astype(int), MaxIter, coefficients, u_data_train_original)
 
         validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
         test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
@@ -233,7 +234,7 @@ class Optimization(object):
     @staticmethod
     def weight2cost_SP(parameter, weight, index_u_l_predict=0, name_case='case_ieee30'):
         """
-        Combine c032, c041-c043, c046
+        Combine c032, c041, c042, c047, c046
         """
 
         type_r = parameter['type_r']
@@ -256,7 +257,7 @@ class Optimization(object):
         u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
         mpc, coefficients, u_data_train, u_data_train_n2, u_data_validation, u_data_test, u_data_train_original = C042().c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
 
-        sxb1, sxc1, LBUB1, time1 = C043().c043_SP(epsilon, LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
+        sxb1, sxc1, LBUB1, time1 = C047().c047_MILP(epsilon, LargeNumber, MaxIter, coefficients, u_data_train_original)
         validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb1, sxc1, LBUB1)
         test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb1, sxc1, LBUB1)
 
