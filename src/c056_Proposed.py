@@ -1,7 +1,6 @@
 ## The data-driven RO method using the uncertainty set without reconstruction
 
 import numpy as np
-import pandas as pd
 
 from utils.optimization import Optimization
 
@@ -9,6 +8,7 @@ optimization = Optimization()
 
 ## Settings
 parameter = {}
+parameter['b_faster'] = False # False: MILP; True: Mountain climbing for subproblems in CCG
 parameter['type_r'] = 'n1' # type_r: 'n1' max in n1; 'n2' quantile in n2; 'n_m' max in n1 and n2; 'n_q' quantile in n1 and n2
 parameter['b_display_SP'] = False
 parameter['num_groups'] = 21

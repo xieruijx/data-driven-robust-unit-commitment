@@ -537,7 +537,15 @@ class C045(object):
             except AttributeError:
                 print("Encountered an attribute error")
 
+        sy = yMP.X[np.argmax(yMP.X @ Cry), :]
+
         time_elapsed = time.time() - time_start
         interpret = {}
+        interpret['x_og'] = sxb[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_pg'] = sxc[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rp'] = sxc[(mpc['n_t'] * mpc['n_g']):(mpc['n_t'] * mpc['n_g'] * 2)].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rn'] = sxc[(mpc['n_t'] * mpc['n_g'] * 2):].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rp'] = sy[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rn'] = sy[(mpc['n_t'] * mpc['n_g']):].reshape((mpc['n_t'], mpc['n_g']))
 
         return u_data, ulist, sxb, sxc, LBUB, time_elapsed, interpret

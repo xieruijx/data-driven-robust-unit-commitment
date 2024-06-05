@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 index_u_l_predict = 0
-index_unit = 3
+index_unit = 0
 
 x_og = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_og_Proposed.txt')
 x_pg = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_pg_Proposed.txt')
@@ -13,8 +13,6 @@ y_rn = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_
 
 # creating a fake data as example
 time = np.linspace(0, 23, 24)
-print(time.shape)
-print(time)
 
 # Creating the figure
 plt.figure(figsize=(7,4))
