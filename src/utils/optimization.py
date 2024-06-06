@@ -62,9 +62,9 @@ class Optimization(object):
                 time2 = 0
         else: # SP/RO methods for discrete uncertainty sets
             if type_SP == 'MILP':
-                sxb1, sxc1, LBUB1, time1, interpret = C047().c047_MILP(epsilon, LargeNumber, MaxIter, coefficients, u_data_train_original)
+                sxb1, sxc1, LBUB1, time1, interpret = C047().c047_MILP(epsilon, mpc, LargeNumber, MaxIter, coefficients, u_data_train_original)
             elif type_SP == 'approx':
-                sxb1, sxc1, LBUB1, time1, interpret = C047().c047_approx(epsilon, MaxIter, coefficients, u_data_train_original)
+                sxb1, sxc1, LBUB1, time1, interpret = C047().c047_approx(epsilon, mpc, MaxIter, coefficients, u_data_train_original)
             else:
                 raise RuntimeError('The type of SP (type_SP) is wrong')
             sxb2 = sxb1
