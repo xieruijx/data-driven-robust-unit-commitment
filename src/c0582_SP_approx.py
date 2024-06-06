@@ -21,7 +21,7 @@ parameter['Tolerance'] = 1e-3 # Tolerance: UB - LB <= Tolerance * UB
 parameter['TimeLimitFC'] = 1 # Time limit of the feasibility check problem
 parameter['TimeLimitSP'] = 1 # Time limit of the subproblem
 parameter['EPS'] = 1e-8 # A small number for margin
-parameter['u_select'] = [False, True, True, False, False, False, True,
+parameter['u_select'] = [True, True, True, True, True, False, True,
             False, True, True, True, True, True, True,
             True, False, True, True, True, True, False,
             True, True, False, False] # Only a part of loads and renewables are uncertain

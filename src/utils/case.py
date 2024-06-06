@@ -105,7 +105,7 @@ class Case(object):
         for i in range(len(bus_uncertain_load)):
             times_uncertain_load[i] = mpc['bus'][bus_uncertain_load[i] - 1, 2] / mpc['baseMVA']
             mpc['bus'][bus_uncertain_load[i] - 1, 2] = 0
-        times_uncertain_wind = - 10 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
+        times_uncertain_wind = -50 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
         mpc['times_uncertain'] = np.concatenate((times_uncertain_load, times_uncertain_wind))
 
         mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
