@@ -33,7 +33,7 @@ index_u_l_predict = 0
 # weight = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight = np.loadtxt('./data/processed/combination/d032_weight.txt')
 np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_weight_Proposed.txt', weight)
-validation_cost, test_cost, sxb1, sxc1, LBUB1, time1, sxb2, sxc2, LBUB2, time2, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight, index_u_l_predict)
+validation_cost, test_cost, sxb1, sxc1, LBUB1, time1, sxb2, sxc2, LBUB2, time2, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight, 'n1', None, index_u_l_predict, 'case_ieee30')
 print(time1)
 print(time2)
 np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_validation_cost_Proposed.txt', validation_cost)

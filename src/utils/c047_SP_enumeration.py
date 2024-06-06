@@ -3,23 +3,21 @@ import time
 import gurobipy as gp
 from gurobipy import GRB
 
-from utils.case import Case
-
 class C047(object):
     """
     C047 class for optimization with respect to a discrete uncertainty set
     """
 
     @staticmethod
-    def c047_approx(rank, MaxIter, coefficients, u_data_train_original):
+    def c047_approx(epsilon, mpc, MaxIter, coefficients, u_data_train_original):
         """
         Using a portion of the list of data
         """
         ## Time
         time_start = time.time()
 
-        ## Load case
-        case = Case()
+        ## Calculate rank
+        rank = np.ceil((1 - epsilon) * u_data_train_original.shape[0]).astype(int)
 
         ## Load compact form
         Adexb = coefficients['Adexb']
@@ -120,22 +118,28 @@ class C047(object):
             except AttributeError:
                 print("Encountered an attribute error")
 
+        sy = yMP.X[np.argmax(yMP.X @ Cry), :]
+
         time_elapsed = time.time() - time_start
         LB = np.concatenate((LB.reshape(-1, 1), LB.reshape(-1, 1)), axis=1)
         LB = LB[:Iter]
+        interpret = {}
+        interpret['x_og'] = sxb[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_pg'] = sxc[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rp'] = sxc[(mpc['n_t'] * mpc['n_g']):(mpc['n_t'] * mpc['n_g'] * 2)].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rn'] = sxc[(mpc['n_t'] * mpc['n_g'] * 2):].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rp'] = sy[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rn'] = sy[(mpc['n_t'] * mpc['n_g']):].reshape((mpc['n_t'], mpc['n_g']))
 
-        return sxb, sxc, LB, time_elapsed
+        return sxb, sxc, LB, time_elapsed, interpret
     
     @staticmethod
-    def c047_MILP(epsilon, LargeNumber, MaxIter, coefficients, u_data_train_original):
+    def c047_MILP(epsilon, mpc, LargeNumber, MaxIter, coefficients, u_data_train_original):
         """
         Using a portion of data and MILP
         """
         ## Time
         time_start = time.time()
-
-        ## Load case
-        case = Case()
 
         ## Load compact form
         Adexb = coefficients['Adexb']
@@ -189,8 +193,17 @@ class C047(object):
         sxc = xcMP.X
         sobj = MP.ObjVal
         LB = np.array([sobj, sobj]).reshape((1, 2))
+
+        sy = yMP.X[np.argmax(yMP.X @ Cry), :]
         
         time_elapsed = time.time() - time_start
+        interpret = {}
+        interpret['x_og'] = sxb[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_pg'] = sxc[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rp'] = sxc[(mpc['n_t'] * mpc['n_g']):(mpc['n_t'] * mpc['n_g'] * 2)].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rn'] = sxc[(mpc['n_t'] * mpc['n_g'] * 2):].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rp'] = sy[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rn'] = sy[(mpc['n_t'] * mpc['n_g']):].reshape((mpc['n_t'], mpc['n_g']))
 
-        return sxb, sxc, LB, time_elapsed
+        return sxb, sxc, LB, time_elapsed, interpret
     

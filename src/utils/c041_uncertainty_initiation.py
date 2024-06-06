@@ -77,8 +77,7 @@ class C041(object):
                 rank = np.ceil((1 - epsilon) * n).astype(int)
                 radius = rho[np.argsort(rho)[rank - 1]]
             else:
-                print('The type of radius is wrong.')
-                return None, None, None
+                raise RuntimeError('The type of radius (type_r) is wrong')
         print('Radius: {} (type: {})'.format(radius, type_r))
 
         return mu, sigma, radius

@@ -122,6 +122,10 @@ class C043(object):
                 sxc = xcMP.X
                 LB[Iter] = MP.ObjVal
                 MPObjX = Cdxb @ sxb + Cdxc @ sxc
+                if np.max(yMPdata.X @ Cry) > np.max(yMP.X @ Cry):
+                    sy = yMPdata.X[np.argmax(yMPdata.X @ Cry), :]
+                else:
+                    sy = yMP.X[np.argmax(yMP.X @ Cry), :]
 
                 print('LB: {} >= first-stage cost: {}'.format(LB[Iter], MPObjX))
 
@@ -287,8 +291,15 @@ class C043(object):
             print("Encountered an attribute error")
 
         time_elapsed = time.time() - time_start
+        interpret = {}
+        interpret['x_og'] = sxb[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_pg'] = sxc[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rp'] = sxc[(mpc['n_t'] * mpc['n_g']):(mpc['n_t'] * mpc['n_g'] * 2)].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rn'] = sxc[(mpc['n_t'] * mpc['n_g'] * 2):].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rp'] = sy[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rn'] = sy[(mpc['n_t'] * mpc['n_g']):].reshape((mpc['n_t'], mpc['n_g']))
 
-        return ulist, sxb, sxc, LBUB, time_elapsed
+        return ulist, sxb, sxc, LBUB, time_elapsed, interpret
     
     @staticmethod
     def c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP):
@@ -509,7 +520,16 @@ class C043(object):
             except AttributeError:
                 print("Encountered an attribute error")
 
-        time_elapsed = time.time() - time_start
+        sy = yMP.X[np.argmax(yMP.X @ Cry), :]
 
-        return ulist, sxb, sxc, LBUB, time_elapsed
+        time_elapsed = time.time() - time_start
+        interpret = {}
+        interpret['x_og'] = sxb[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_pg'] = sxc[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rp'] = sxc[(mpc['n_t'] * mpc['n_g']):(mpc['n_t'] * mpc['n_g'] * 2)].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['x_rn'] = sxc[(mpc['n_t'] * mpc['n_g'] * 2):].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rp'] = sy[:(mpc['n_t'] * mpc['n_g'])].reshape((mpc['n_t'], mpc['n_g']))
+        interpret['y_rn'] = sy[(mpc['n_t'] * mpc['n_g']):].reshape((mpc['n_t'], mpc['n_g']))
+
+        return ulist, sxb, sxc, LBUB, time_elapsed, interpret
     
