@@ -68,7 +68,7 @@ class C041(object):
                     sigma[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)] = sigma0[(i * horizon):((i + 1) * horizon), (i * horizon):((i + 1) * horizon)]
             else:
                 sigma = sigma0
-            rho = np.diagonal(derror_n1 @ np.linalg.solve(sigma, derror_n1.T))
+            rho = np.diagonal(derror @ np.linalg.solve(sigma, derror.T))
 
             ## Find radius
             if type_r == 'n_m':

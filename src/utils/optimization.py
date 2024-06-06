@@ -57,7 +57,7 @@ class Optimization(object):
                     _, _, sxb2, sxc2, LBUB2, time2, interpret = C045().c045_CCG_n2_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data)
             else: # type_r = 'n2', 'n_m', 'n_q'
                 sxb2 = sxb1
-                sxc2 = sxc2
+                sxc2 = sxc1
                 LBUB2 = LBUB1
                 time2 = 0
         else: # SP/RO methods for discrete uncertainty sets
@@ -68,7 +68,7 @@ class Optimization(object):
             else:
                 raise RuntimeError('The type of SP (type_SP) is wrong')
             sxb2 = sxb1
-            sxc2 = sxc2
+            sxc2 = sxc1
             LBUB2 = LBUB1
             time2 = 0
 
