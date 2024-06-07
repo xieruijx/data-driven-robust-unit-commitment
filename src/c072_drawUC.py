@@ -10,7 +10,7 @@ type_method = 'P2'
 
 for index_unit in range(num_unit):
 
-    x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.input_strategy(30, index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/')
+    x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.read_strategy(30, index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/')
 
     # creating a fake data as example
     time = np.linspace(0, 23, 24)
