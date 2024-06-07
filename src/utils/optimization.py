@@ -15,7 +15,7 @@ class Optimization(object):
     """
     
     @staticmethod
-    def weight2cost(parameter, weight, type_r='n1', type_SP=None, index_u_l_predict=0, name_case='case_ieee30'):
+    def weight2cost(parameter, weight, type_r='n1', type_SP=None, index_u_l_predict=0, name_case='case_ieee30', type_u_l='test'):
         """
         Combine c032, c041-c046
         """
@@ -37,7 +37,14 @@ class Optimization(object):
 
         train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, num_wind, weight)
 
-        u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        if type_u_l == 'train':
+            u_l_predict = train_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'validation':
+            u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'test':
+            u_l_predict = test_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        else:
+            raise RuntimeError('The type of u_l (type_u_l) is wrong')
 
         error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
 
