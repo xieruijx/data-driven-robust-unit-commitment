@@ -1,18 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils.io import IO
+
 index_u_l_predict = 0
+type_u_l = 'test'
 num_unit = 6
 type_method = 'P2'
 
 for index_unit in range(num_unit):
 
-    x_og = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_og_' + type_method + '.txt')
-    x_pg = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_pg_' + type_method + '.txt')
-    x_rp = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_rp_' + type_method + '.txt')
-    x_rn = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_rn_' + type_method + '.txt')
-    y_rp = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_y_rp_' + type_method + '.txt')
-    y_rn = np.loadtxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_y_rn_' + type_method + '.txt')
+    x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.input_strategy(30, index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/')
 
     # creating a fake data as example
     time = np.linspace(0, 23, 24)

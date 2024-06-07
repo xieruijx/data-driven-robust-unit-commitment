@@ -87,6 +87,7 @@ class Optimization(object):
         print('Calculated bound: {}'.format(LBUB2[-1, 0]))
         print('Validation bound:')
         print(validation_cost[:3])
+        time = [time1, time2]
 
-        return validation_cost, test_cost, sxb1, sxc1, LBUB1, time1, sxb2, sxc2, LBUB2, time2, train_cost, train_order, interpret
+        return validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret
     

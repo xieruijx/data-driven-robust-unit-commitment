@@ -4,6 +4,7 @@ import numpy as np
 
 from utils.optimization import Optimization
 from utils.case import Case
+from utils.io import IO
 
 optimization = Optimization()
 
@@ -11,24 +12,12 @@ optimization = Optimization()
 parameter = Case().case_ieee30_parameter()
 
 index_u_l_predict = 0
+type_u_l = 'test'
 
 ## Set weight as the optimized one
 # weight = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight = np.loadtxt('./data/processed/combination/d032_weight.txt')
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_weight_SP_MILP.txt', weight)
-validation_cost, test_cost, sxb1, sxc1, LBUB1, time1, sxb2, sxc2, LBUB2, time2, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight, 'n1', 'MILP', index_u_l_predict, 'case_ieee30')
-print(time1)
-print(time2)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_validation_cost_SP_MILP.txt', validation_cost)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_test_cost_SP_MILP.txt', test_cost)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_LBUB1_SP_MILP.txt', LBUB1)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_LBUB2_SP_MILP.txt', LBUB2)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_train_cost_SP_MILP.txt', train_cost)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_train_order_SP_MILP.txt', train_order)
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_og_SP_MILP.txt', interpret['x_og'])
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_pg_SP_MILP.txt', interpret['x_pg'])
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_rp_SP_MILP.txt', interpret['x_rp'])
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_x_rn_SP_MILP.txt', interpret['x_rn'])
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_y_rp_SP_MILP.txt', interpret['y_rp'])
-np.savetxt('./data/processed/weight/index_' + str(index_u_l_predict) + '_y_rn_SP_MILP.txt', interpret['y_rn'])
 
+validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight, 'n1', 'MILP', index_u_l_predict, 'case_ieee30', type_u_l)
+print(time)
+IO().output_UC(30, index_u_l_predict, type_u_l, weight, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'SP_MILP', folder_outputs='./results/outputs/', folder_strategies='./results/strategies/')
