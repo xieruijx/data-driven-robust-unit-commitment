@@ -123,6 +123,31 @@ class Case(object):
         mpc['u_ll'] = np.zeros(mpc['u_l_predict'].shape)
 
         return mpc
+    
+    @staticmethod
+    def case_ieee30_parameter(b_faster=False, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1):
+        """
+        Parameters for the IEEE 30-bus unit commitment computation
+        """
+        parameter = {}
+        parameter['b_faster'] = b_faster # False: MILP; True: Mountain climbing for subproblems in CCG
+        parameter['b_display_SP'] = b_display_SP
+        parameter['num_groups'] = 21
+        parameter['num_wind'] = 4
+        parameter['horizon'] = 24
+        parameter['epsilon'] = epsilon # chance constraint parameter
+        parameter['delta'] = 0.05 # probability guarantee parameter
+        parameter['MaxIter'] = MaxIter # Maximum iteration number of CCG
+        parameter['LargeNumber'] = 1e8 # For the big-M method
+        parameter['Tolerance'] = 1e-3 # Tolerance: UB - LB <= Tolerance * UB
+        parameter['TimeLimitFC'] = TimeLimit # Time limit of the feasibility check problem
+        parameter['TimeLimitSP'] = TimeLimit # Time limit of the subproblem
+        parameter['EPS'] = 1e-8 # A small number for margin
+        parameter['u_select'] = [False, True, True, False, False, False, True,
+                    False, True, True, True, True, True, True,
+                    True, False, True, True, True, True, False,
+                    True, True, False, False] # Only a part of loads and renewables are uncertain
+        return parameter
 
     @staticmethod
     def case118():
