@@ -74,7 +74,7 @@ class C042(object):
         elif name_case == 'case118':
             mpc = case.case118_modified(parameter)
         else:
-            mpc = case.case_ieee30_modified(parameter)
+            raise RuntimeError('The case name is wrong')
 
         mpc = case.process_case(mpc)
 

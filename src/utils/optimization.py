@@ -8,6 +8,7 @@ from utils.c044_reconstruction import C044
 from utils.c045_CCG_polyhedron import C045
 from utils.c046_evaluation import C046
 from utils.c047_SP_enumeration import C047
+from utils.case import Case
 
 class Optimization(object):
     """
@@ -91,3 +92,49 @@ class Optimization(object):
 
         return validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret
     
+    @staticmethod
+    def weight2ellipsoid(parameter, weight, type_r='n1', index_u_l_predict=0, name_case='case_ieee30', type_u_l='test'):
+        """
+        Combine c032 and c041 and output the parameters of ellipsoidal uncertainty set
+        """
+
+        num_groups = parameter['num_groups']
+        num_wind = parameter['num_wind']
+        horizon = parameter['horizon']
+        epsilon = parameter['epsilon']
+        delta = parameter['delta']
+        u_select = parameter['u_select']
+
+        _, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, _, validation_predict, _, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, num_wind, weight)
+
+        if type_u_l == 'train':
+            u_l_predict = train_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'validation':
+            u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'test':
+            u_l_predict = test_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        else:
+            raise RuntimeError('The type of u_l (type_u_l) is wrong')
+
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty(type_r, horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+
+        parameter['u_l_predict'] = u_l_predict
+        parameter['error_mu'] = error_mu
+        parameter['error_sigma'] = error_sigma
+        parameter['error_rho'] = error_rho
+        parameter['error_bounds'] = error_bounds
+
+        ## Load case
+        if name_case == 'case_ieee30':
+            mpc = Case().case_ieee30_modified(parameter)
+        elif name_case == 'case118':
+            mpc = Case().case118_modified(parameter)
+        else:
+            raise RuntimeError('The case name is wrong')
+        
+        mpc = Case().process_case(mpc)
+        u_l_predict = mpc['u_l_predict']
+        error_lb = mpc['error_lb']
+        error_ub = mpc['error_ub']
+
+        return error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub

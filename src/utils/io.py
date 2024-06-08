@@ -77,4 +77,53 @@ class IO(object):
         df = pd.DataFrame(outputs, index=['train quantile', 'validation quantile', 'test quantile', 'objective', 'time']).T
         print(df)
         df.to_csv(folder_outputs + str(num_bus) + '/outputs.csv')
-        
+    
+    @staticmethod
+    def ellipse(A, B, C, R, x0, y0, num_points=400):
+        """
+        Calculate the lines for plotting an ellipse
+        A (x - x0)^2 + B (x - x0) (y - y0) + C (y - y0)^2 <= R
+        """
+        # The range of x
+        xm = np.sqrt(R / (A - B * B / 4 / C))
+        # Values for x at which to compute y values for the plots:
+        x = np.linspace(x0 - xm, x0 + xm, num_points)
+        # yp, yn: The upper and lower parts
+        yp = np.zeros(x.shape)
+        yp[1:-1] = y0 + (- B * (x[1:-1] - x0) + np.sqrt(B * B * (x[1:-1] - x0) * (x[1:-1] - x0) - 4 * C * (A * (x[1:-1] - x0) * (x[1:-1] - x0) - R))) / 2 / C
+        yp[0] = y0 + B * xm / 2 / C
+        yp[-1] = y0 - B * xm / 2 / C
+        yn = np.zeros(x.shape)
+        yn[1:-1] = y0 + (- B * (x[1:-1] - x0) - np.sqrt(B * B * (x[1:-1] - x0) * (x[1:-1] - x0) - 4 * C * (A * (x[1:-1] - x0) * (x[1:-1] - x0) - R))) / 2 / C
+        yn[0] = y0 + B * xm / 2 / C
+        yn[-1] = y0 - B * xm / 2 / C
+        return x, yp, yn
+    
+    @staticmethod
+    def projection(index_projection, error_mu, error_sigma, error_rho, u_l_predict, num_points=400):
+        """
+        Project the multi-dimensional ellipsoid to a two-dimensional ellipse
+        sum(u1t) and sum(u2t)
+        """
+        u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
+        x0 = np.sum(u_l[:, index_projection[0]])
+        y0 = np.sum(u_l[:, index_projection[1]])
+
+        P = np.eye(error_mu.shape[0])
+        for i in range(u_l.shape[1]):
+            P[24 * (i - 1), 24 * (i - 1) + 1: 24 * i] = - 1
+        error_sigma = P.T @ error_sigma @ P
+
+        sigma11 = error_sigma[index_projection, :][:, index_projection]
+        sigma12 = np.delete(error_sigma, index_projection, axis=1)[index_projection, :]
+        sigma22 = np.delete(np.delete(error_sigma, index_projection, axis=0), index_projection, axis=1)
+
+        sigma_p = sigma11 - sigma12 @ np.linalg.inv(sigma22) @ (sigma12.T)
+
+        A = sigma_p[0, 0]
+        B = sigma_p[0, 1] + sigma_p[1, 0]
+        C = sigma_p[1, 1]
+
+        x, yp, yn = IO().ellipse(A, B, C, error_rho, x0, y0, num_points)
+        return x, yp, yn
+    
