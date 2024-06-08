@@ -100,7 +100,7 @@ class IO(object):
         return x, yp, yn
     
     @staticmethod
-    def projection(index_projection, error_mu, error_sigma, error_rho, u_l_predict, num_points=400):
+    def projection_sum(index_projection, error_mu, error_sigma, error_rho, u_l_predict, num_points=400):
         """
         Project the multi-dimensional ellipsoid to a two-dimensional ellipse
         sum(u1t) and sum(u2t)
@@ -108,15 +108,16 @@ class IO(object):
         u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
         x0 = np.sum(u_l[:, index_projection[0]])
         y0 = np.sum(u_l[:, index_projection[1]])
+        sigma = np.linalg.inv(error_sigma)
 
         P = np.eye(error_mu.shape[0])
         for i in range(u_l.shape[1]):
             P[24 * (i - 1), 24 * (i - 1) + 1: 24 * i] = - 1
-        error_sigma = P.T @ error_sigma @ P
+        sigma = P.T @ sigma @ P
 
-        sigma11 = error_sigma[index_projection, :][:, index_projection]
-        sigma12 = np.delete(error_sigma, index_projection, axis=1)[index_projection, :]
-        sigma22 = np.delete(np.delete(error_sigma, index_projection, axis=0), index_projection, axis=1)
+        sigma11 = sigma[index_projection, :][:, index_projection]
+        sigma12 = np.delete(sigma, index_projection, axis=1)[index_projection, :]
+        sigma22 = np.delete(np.delete(sigma, index_projection, axis=0), index_projection, axis=1)
 
         sigma_p = sigma11 - sigma12 @ np.linalg.inv(sigma22) @ (sigma12.T)
 
