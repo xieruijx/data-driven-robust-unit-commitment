@@ -23,26 +23,37 @@ parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
 #                     False, False, False, False, False, False, False,
 #                     False, False, False, False] # Only 2 loads are uncertain
 
-index_uncertainty = [0, 1] # load 0-13, wind 14-15
+b_sum = True # True for sum across periods, False for one period
+index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
+# b_sum = False
+# index_uncertainty = [160, 161]
 
 # weight_optimize = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
+## Upper and lower bounds under the common weight
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
+xlx, xly, xux, xuy, ylx, yly, yux, yuy = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
+
 ## P1: The data-driven RO method using the uncertainty set without reconstruction
-error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-x_P1, yp_P1, yn_P1 = IO().projection_sum(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, num_points=400)
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
+x_P1, yp_P1, yn_P1 = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## RO_max: The data-driven RO method using the 100% ellipsoidal uncertainty set
-error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_m', index_u_l_predict, 'case_ieee30', type_u_l)
-x_RO_max, yp_RO_max, yn_RO_max = IO().projection_sum(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, num_points=400)
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_m', index_u_l_predict, 'case_ieee30', type_u_l)
+x_RO_max, yp_RO_max, yn_RO_max = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## RO_quantile: The data-driven RO method using the 1 - epsilon ellipsoidal uncertainty set
-error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_q', index_u_l_predict, 'case_ieee30', type_u_l)
-x_RO_quantile, yp_RO_quantile, yn_RO_quantile = IO().projection_sum(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, num_points=400)
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_q', index_u_l_predict, 'case_ieee30', type_u_l)
+x_RO_quantile, yp_RO_quantile, yn_RO_quantile = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 # Plotting:
 fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
+ax.plot(xlx, xly, 'k', label="Bound")
+ax.plot(xux, xuy, 'k')
+ax.plot(ylx, yly, 'k')
+ax.plot(yux, yuy, 'k')
 ax.plot(x_P1, yp_P1, 'r', label="P1")
 ax.plot(x_P1, yn_P1, 'r')
 ax.plot(x_RO_max, yp_RO_max, 'g', label="RO_max")

@@ -136,5 +136,8 @@ class Optimization(object):
         u_l_predict = mpc['u_l_predict']
         error_lb = mpc['error_lb']
         error_ub = mpc['error_ub']
+        u_lu = mpc['u_lu']
+        u_ll = mpc['u_ll']
 
-        return error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub
+        return error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll
+    

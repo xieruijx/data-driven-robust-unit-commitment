@@ -1,3 +1,4 @@
+from operator import index
 import numpy as np
 import pandas as pd
 
@@ -100,33 +101,62 @@ class IO(object):
         return x, yp, yn
     
     @staticmethod
-    def projection_sum(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, num_points=400):
+    def projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum=True, num_points=400):
         """
         Project the multi-dimensional ellipsoid to a two-dimensional ellipse
         sum(u1t) and sum(u2t)
         """
-        u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
-        x0 = np.sum(u_l[:, index_uncertainty[0]])
-        y0 = np.sum(u_l[:, index_uncertainty[1]])
-        sigma = np.linalg.inv(error_sigma)
+        if b_sum:
+            u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
+            x0 = np.sum(u_l[:, index_uncertainty[0]])
+            y0 = np.sum(u_l[:, index_uncertainty[1]])
 
-        P = np.eye(error_mu.shape[0])
-        for i in range(u_l.shape[1]):
-            P[i, i + 1: 24: -1] = - 1
-        sigma = P.T @ sigma @ P
+            P = np.eye(error_mu.shape[0])
+            for i in range(u_l.shape[1]):
+                P[i, i + 1: 24: -1] = - 1
+            sigma = P.T @ np.linalg.inv(error_sigma) @ P
+        else:
+            u_l = u_l_predict - error_mu
+            x0 = u_l[index_uncertainty[0]]
+            y0 = u_l[index_uncertainty[1]]
 
-        index_projection = index_uncertainty
-        sigma11 = sigma[index_projection, :][:, index_projection]
-        sigma12 = np.delete(sigma, index_projection, axis=1)[index_projection, :]
-        sigma22 = np.delete(np.delete(sigma, index_projection, axis=0), index_projection, axis=1)
+            sigma = np.linalg.inv(error_sigma)
+
+        sigma11 = sigma[index_uncertainty, :][:, index_uncertainty]
+        sigma12 = np.delete(sigma, index_uncertainty, axis=1)[index_uncertainty, :]
+        sigma22 = np.delete(np.delete(sigma, index_uncertainty, axis=0), index_uncertainty, axis=1)
 
         sigma_p = sigma11 - sigma12 @ np.linalg.inv(sigma22) @ (sigma12.T)
 
         A = sigma_p[0, 0]
         B = sigma_p[0, 1] + sigma_p[1, 0]
         C = sigma_p[1, 1]
-        print([A, B, C])
 
         x, yp, yn = IO().ellipse(A, B, C, error_rho, x0, y0, num_points)
         return x, yp, yn
     
+    @staticmethod
+    def projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum=True):
+        ul = np.maximum(u_ll, u_l_predict - error_ub)
+        uu = np.minimum(u_lu, u_l_predict - error_lb)
+
+        if b_sum:
+            ul = ul.reshape((24, -1))
+            uu = uu.reshape((24, -1))
+
+            lb = np.sum(ul[:, index_uncertainty], axis=0)
+            ub = np.sum(uu[:, index_uncertainty], axis=0)
+        else:
+            lb = ul[index_uncertainty]
+            ub = uu[index_uncertainty]
+
+        xlx = [lb[0], lb[0]]
+        xly = [lb[1], ub[1]]
+        xux = [ub[0], ub[0]]
+        xuy = [lb[1], ub[1]]
+        ylx = [lb[0], ub[0]]
+        yly = [lb[1], lb[1]]
+        yux = [lb[0], ub[0]]
+        yuy = [ub[1], ub[1]]
+
+        return xlx, xly, xux, xuy, ylx, yly, yux, yuy
