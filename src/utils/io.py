@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-
-from pypoman import project_polytope
+import gurobipy as gp
+from gurobipy import GRB
 
 class IO(object):
     """
@@ -162,10 +162,49 @@ class IO(object):
         yux = [lb[0], ub[0]]
         yuy = [ub[1], ub[1]]
 
-        return xlx, xly, xux, xuy, ylx, yly, yux, yuy
+        return xlx, xly, xux, xuy, ylx, yly, yux, yuy, lb, ub
+    
+    @staticmethod
+    def ineq2vertex(pA, pB):
+        """
+        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Output the vertices in shape (-1, 2)
+        No abundant constraint
+        """
+        pAnorm = np.sqrt(pA[:, 0] * pA[:, 0] + pA[:, 1] * pA[:, 1])
+        pA[:, 0] = pA[:, 0] / pAnorm
+        pA[:, 1] = pA[:, 1] / pAnorm
+        pB = pB / pAnorm
+
+        pA1p = pA[pA[:, 1] >= 0, :]
+        pB1p = pB[pA[:, 1] >= 0]
+        pA1n = pA[pA[:, 1] < 0, :]
+        pB1n = pB[pA[:, 1] < 0]
+        index = np.argsort(pA1p[:, 0])[::-1]
+        pA1p = pA1p[index, :]
+        pB1p = pB1p[index]
+        index = np.argsort(pA1n[:, 0])
+        pA1n = pA1n[index, :]
+        pB1n = pB1n[index]
+
+        pAsort = np.concatenate((pA1p, pA1n), axis=0)
+        pBsort = np.concatenate((pB1p, pB1n))
+
+        num_con = pAsort.shape[0]
+        
+        vertices = np.zeros((num_con, 2))
+        for i in range(num_con - 1):
+            vertices[i, 0] = (pBsort[i] * pAsort[i + 1, 1] - pBsort[i + 1] * pAsort[i, 1]) / (pAsort[i, 0] * pAsort[i + 1, 1] - pAsort[i, 1] * pAsort[i + 1, 0])
+            vertices[i, 1] = (pBsort[i] * pAsort[i + 1, 0] - pBsort[i + 1] * pAsort[i, 0]) / (pAsort[i, 1] * pAsort[i + 1, 0] - pAsort[i, 0] * pAsort[i + 1, 1])
+        vertices[-1, 0] = (pBsort[-1] * pAsort[0, 1] - pBsort[1] * pAsort[-1, 1]) / (pAsort[-1, 0] * pAsort[0, 1] - pAsort[-1, 1] * pAsort[0, 0])
+        vertices[-1, 1] = (pBsort[-1] * pAsort[0, 0] - pBsort[1] * pAsort[-1, 0]) / (pAsort[-1, 1] * pAsort[0, 0] - pAsort[-1, 0] * pAsort[0, 1])
+
+        print(vertices)
+        
+        return vertices
 
     @staticmethod
-    def projection_polyhedron(index_uncertainty, coefficients, b_sum=True):
+    def projection_polyhedron(index_uncertainty, coefficients, pmin, pmax, b_sum=True):
         """
         Project the multi-dimensional polyhedron to a two-dimensional polyhedron
         """
@@ -177,22 +216,49 @@ class IO(object):
 
         dim_u = Aueu.shape[1]
         dim_y = Auey.shape[1]
-        dim_i = Bui.shape[0]
 
-        P = np.eye(Aueu.shape[1])
+        Eu = np.zeros((2, dim_u))
         if b_sum:
-            for i in range(Aueu.shape[1] // 24):
-                P[i, i + 1: 24: -1] = - 1
+            Eu[0, index_uncertainty[0]:-1:24] = 1
+            Eu[1, index_uncertainty[1]:-1:24] = 1
+        else:
+            Eu[0, index_uncertainty[0]] = 1
+            Eu[1, index_uncertainty[1]] = 1
 
-        A = np.concatenate((np.zeros((dim_i, dim_u)), - Auiy), axis=1) # A * x <= b
-        b = - Bui
-        C = np.concatenate((Aueu @ P, Auey), axis=1) # C * x == d
-        d = Bue
-        E = np.zeros((2, dim_u + dim_y)) # proj(x) = E * x + f
-        E[0, index_uncertainty[0]] = 1
-        E[1, index_uncertainty[1]] = 1
-        f = np.zeros(2)
+        pA = np.array([[1, 0],
+                       [0, 1],
+                       [-1, 0],
+                       [0, -1]]) # pA p >= pB
+        pB = np.array([pmin[0], pmin[1], -pmax[0], -pmax[1]])
+        pB = np.array([-4, -3, -2, -1])
+        
+        while True:
+            vertices = IO().ineq2vertex(pA, pB)
 
-        vertices = project_polytope((E, f), (A, b), (C, d), method='cdd')
+            num_v = len(vertices)
+            distance = 0
+            xv = vertices[0, :]
+            v = vertices[0, :]
+            for i in range(num_v):
+                m = gp.Model('m')
+                u = m.addMVar((dim_u,), lb=0, ub=1, vtype=GRB.CONTINUOUS)
+                y = m.addMVar((dim_y,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
+                m.addConstr(Aueu @ u + Auey @ y == Bue, name='e')
+                m.addConstr(Auiy @ y >= Bui, name='i')
+                m.setObjective(gp.quicksum((Eu @ u - vertices[i, :]) * (Eu @ u - vertices[i, :])), GRB.MINIMIZE)
+                m.optimize()
+                if m.ObjVal > distance:
+                    xv = Eu @ u.X
+                    v = vertices[i, :]
+                    distance = m.ObjVal
+            if distance < 1e-5:
+                break
+            a = xv - v
+            pA = np.concatenate((pA, - a.reshape((1, 2))), axis=0)
+            pB = np.append(pB, - a @ xv)
+            print(distance)
+            print(vertices)
+            print(pA)
+            print(pB)
 
         return vertices

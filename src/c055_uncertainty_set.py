@@ -32,9 +32,9 @@ index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
-# ## Upper and lower bounds under the common weight
-# error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-# xlx, xly, xux, xuy, ylx, yly, yux, yuy = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
+## Upper and lower bounds under the common weight
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
+xlx, xly, xux, xuy, ylx, yly, yux, yuy, pmin, pmax = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
 
 ## The first uncertainty set of Proposed
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n1', index_u_l_predict, 'case_ieee30', type_u_l)
@@ -70,7 +70,7 @@ coefficients['Auey'] = np.load('./data/temp/Auey_P2.npy')
 coefficients['Auiy'] = np.load('./data/temp/Auiy_P2.npy')
 coefficients['Bue'] = np.load('./data/temp/Bue_P2.npy')
 coefficients['Bui'] = np.load('./data/temp/Bui_P2.npy')
-vertices = IO().projection_polyhedron(index_uncertainty, coefficients, b_sum)
+vertices = IO().projection_polyhedron(index_uncertainty, coefficients, pmin, pmax, b_sum)
 
 # Plotting:
 fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
