@@ -32,9 +32,13 @@ index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
-## Upper and lower bounds under the common weight
-error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-xlx, xly, xux, xuy, ylx, yly, yux, yuy = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
+# ## Upper and lower bounds under the common weight
+# error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
+# xlx, xly, xux, xuy, ylx, yly, yux, yuy = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
+
+## The first uncertainty set of Proposed
+error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n1', index_u_l_predict, 'case_ieee30', type_u_l)
+x_Proposed1, yp_Proposed1, yn_Proposed1 = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## P1: The data-driven RO method using the uncertainty set without reconstruction
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
@@ -48,12 +52,34 @@ x_RO_max, yp_RO_max, yn_RO_max = IO().projection_ellipse(index_uncertainty, erro
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_q', index_u_l_predict, 'case_ieee30', type_u_l)
 x_RO_quantile, yp_RO_quantile, yn_RO_quantile = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
+## P2: The data-driven RO method using the weight optimized by minimizing the error measure
+# coefficients = optimization.weight2polyhedron(parameter, weight_error, index_u_l_predict, 'case_ieee30', type_u_l)
+# Aueu = coefficients['Aueu'].todense()
+# Auey = coefficients['Auey'].todense()
+# Auiy = coefficients['Auiy'].todense()
+# Bue = coefficients['Bue']
+# Bui = coefficients['Bui']
+# np.save('./data/temp/Aueu_P2.npy', Aueu)
+# np.save('./data/temp/Auey_P2.npy', Auey)
+# np.save('./data/temp/Auiy_P2.npy', Auiy)
+# np.save('./data/temp/Bue_P2.npy', Bue)
+# np.save('./data/temp/Bui_P2.npy', Bui)
+coefficients = {}
+coefficients['Aueu'] = np.load('./data/temp/Aueu_P2.npy')
+coefficients['Auey'] = np.load('./data/temp/Auey_P2.npy')
+coefficients['Auiy'] = np.load('./data/temp/Auiy_P2.npy')
+coefficients['Bue'] = np.load('./data/temp/Bue_P2.npy')
+coefficients['Bui'] = np.load('./data/temp/Bui_P2.npy')
+vertices = IO().projection_polyhedron(index_uncertainty, coefficients, b_sum)
+
 # Plotting:
 fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
-ax.plot(xlx, xly, 'k', label="Bound")
-ax.plot(xux, xuy, 'k')
-ax.plot(ylx, yly, 'k')
-ax.plot(yux, yuy, 'k')
+# ax.plot(xlx, xly, 'k', label="Bound")
+# ax.plot(xux, xuy, 'k')
+# ax.plot(ylx, yly, 'k')
+# ax.plot(yux, yuy, 'k')
+ax.plot(x_Proposed1, yp_Proposed1, 'y', label='Proposed1')
+ax.plot(x_Proposed1, yn_Proposed1, 'y')
 ax.plot(x_P1, yp_P1, 'r', label="P1")
 ax.plot(x_P1, yn_P1, 'r')
 ax.plot(x_RO_max, yp_RO_max, 'g', label="RO_max")

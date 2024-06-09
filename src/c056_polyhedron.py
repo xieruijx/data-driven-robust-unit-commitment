@@ -1,4 +1,3 @@
-import pylab
 import matplotlib.pyplot as plt
 
 from numpy import array, eye, ones, vstack, zeros
@@ -25,11 +24,6 @@ f = zeros(p)
 proj = (E, f)  # proj(x) = E * x + f
 
 vertices = project_polytope(proj, ineq, eq, method='bretl')
-
-# pylab.ion()
-# pylab.figure()
-# plot_polygon(vertices)
-# pylab.show()
 
 plt.figure()
 plot_polygon(vertices)

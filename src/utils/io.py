@@ -1,6 +1,7 @@
-from operator import index
 import numpy as np
 import pandas as pd
+
+from pypoman import project_polytope
 
 class IO(object):
     """
@@ -104,7 +105,6 @@ class IO(object):
     def projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum=True, num_points=400):
         """
         Project the multi-dimensional ellipsoid to a two-dimensional ellipse
-        sum(u1t) and sum(u2t)
         """
         if b_sum:
             u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
@@ -137,6 +137,9 @@ class IO(object):
     
     @staticmethod
     def projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum=True):
+        """
+        Project the multi-dimensional bounds to two dimensions
+        """
         ul = np.maximum(u_ll, u_l_predict - error_ub)
         uu = np.minimum(u_lu, u_l_predict - error_lb)
 
@@ -160,3 +163,36 @@ class IO(object):
         yuy = [ub[1], ub[1]]
 
         return xlx, xly, xux, xuy, ylx, yly, yux, yuy
+
+    @staticmethod
+    def projection_polyhedron(index_uncertainty, coefficients, b_sum=True):
+        """
+        Project the multi-dimensional polyhedron to a two-dimensional polyhedron
+        """
+        Aueu = coefficients['Aueu']
+        Auey = coefficients['Auey']
+        Auiy = coefficients['Auiy']
+        Bue = coefficients['Bue']
+        Bui = coefficients['Bui']
+
+        dim_u = Aueu.shape[1]
+        dim_y = Auey.shape[1]
+        dim_i = Bui.shape[0]
+
+        P = np.eye(Aueu.shape[1])
+        if b_sum:
+            for i in range(Aueu.shape[1] // 24):
+                P[i, i + 1: 24: -1] = - 1
+
+        A = np.concatenate((np.zeros((dim_i, dim_u)), - Auiy), axis=1) # A * x <= b
+        b = - Bui
+        C = np.concatenate((Aueu @ P, Auey), axis=1) # C * x == d
+        d = Bue
+        E = np.zeros((2, dim_u + dim_y)) # proj(x) = E * x + f
+        E[0, index_uncertainty[0]] = 1
+        E[1, index_uncertainty[1]] = 1
+        f = np.zeros(2)
+
+        vertices = project_polytope((E, f), (A, b), (C, d), method='cdd')
+
+        return vertices

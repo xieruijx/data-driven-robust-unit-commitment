@@ -141,3 +141,46 @@ class Optimization(object):
 
         return error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll
     
+    @staticmethod
+    def weight2polyhedron(parameter, weight, index_u_l_predict=0, name_case='case_ieee30', type_u_l='test'):
+        """
+        Combine c032 and c041-C044
+        """
+        b_faster = parameter['b_faster']
+        b_display_SP = parameter['b_display_SP']
+        num_groups = parameter['num_groups']
+        num_wind = parameter['num_wind']
+        horizon = parameter['horizon']
+        epsilon = parameter['epsilon']
+        delta = parameter['delta']
+        MaxIter = parameter['MaxIter']
+        LargeNumber = parameter['LargeNumber']
+        Tolerance = parameter['Tolerance']
+        TimeLimitFC = parameter['TimeLimitFC']
+        TimeLimitSP = parameter['TimeLimitSP']
+        EPS = parameter['EPS']
+        u_select = parameter['u_select']
+
+        train_real, train_predict, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, error_bounds = C032().c032_calculate_weight(num_groups, num_wind, weight)
+
+        if type_u_l == 'train':
+            u_l_predict = train_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'validation':
+            u_l_predict = validation_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        elif type_u_l == 'test':
+            u_l_predict = test_predict[(index_u_l_predict * horizon):((index_u_l_predict + 1) * horizon)]
+        else:
+            raise RuntimeError('The type of u_l (type_u_l) is wrong')
+
+        error_mu, error_sigma, error_rho = C041().c041_initial_uncertainty('n1', horizon, epsilon, delta, u_select, train_n1_real, train_n1_predict, train_n2_real, train_n2_predict)
+
+        mpc, coefficients, u_data_train, u_data_train_n2, _, _, _ = C042().c042_dispatch_model(u_select, error_mu, error_sigma, error_rho, error_bounds, EPS, train_real, train_predict, train_n2_real, train_n2_predict, validation_real, validation_predict, test_real, test_predict, u_l_predict, name_case)
+
+        if not b_faster:
+            _, sxb1, sxc1, LBUB1, _, _ = C043().c043_CCG_n1(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
+        else:
+            _, sxb1, sxc1, LBUB1, _, _ = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
+
+        _, _, coefficients = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
+
+        return coefficients
