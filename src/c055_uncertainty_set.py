@@ -4,7 +4,7 @@ import numpy as np
 
 from utils.optimization import Optimization
 from utils.case import Case
-from utils.io import IO
+from utils.projection import Project
 
 optimization = Optimization()
 
@@ -34,23 +34,23 @@ weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
 ## Upper and lower bounds under the common weight
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-xlx, xly, xux, xuy, ylx, yly, yux, yuy, pmin, pmax = IO().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
+xlx, xly, xux, xuy, ylx, yly, yux, yuy, pmin, pmax = Project().projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum)
 
 ## The first uncertainty set of Proposed
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n1', index_u_l_predict, 'case_ieee30', type_u_l)
-x_Proposed1, yp_Proposed1, yn_Proposed1 = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
+x_Proposed1, yp_Proposed1, yn_Proposed1 = Project().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## P1: The data-driven RO method using the uncertainty set without reconstruction
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-x_P1, yp_P1, yn_P1 = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
+x_P1, yp_P1, yn_P1 = Project().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## RO_max: The data-driven RO method using the 100% ellipsoidal uncertainty set
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_m', index_u_l_predict, 'case_ieee30', type_u_l)
-x_RO_max, yp_RO_max, yn_RO_max = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
+x_RO_max, yp_RO_max, yn_RO_max = Project().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## RO_quantile: The data-driven RO method using the 1 - epsilon ellipsoidal uncertainty set
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n_q', index_u_l_predict, 'case_ieee30', type_u_l)
-x_RO_quantile, yp_RO_quantile, yn_RO_quantile = IO().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
+x_RO_quantile, yp_RO_quantile, yn_RO_quantile = Project().projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum, num_points=400)
 
 ## P2: The data-driven RO method using the weight optimized by minimizing the error measure
 # coefficients = optimization.weight2polyhedron(parameter, weight_error, index_u_l_predict, 'case_ieee30', type_u_l)
@@ -70,7 +70,9 @@ coefficients['Auey'] = np.load('./data/temp/Auey_P2.npy')
 coefficients['Auiy'] = np.load('./data/temp/Auiy_P2.npy')
 coefficients['Bue'] = np.load('./data/temp/Bue_P2.npy')
 coefficients['Bui'] = np.load('./data/temp/Bui_P2.npy')
-vertices = IO().projection_polyhedron(index_uncertainty, coefficients, pmin, pmax, b_sum)
+vertices = Project().projection_polyhedron(index_uncertainty, coefficients, pmin, pmax, b_sum)
+x_P2 = np.append(vertices[:, 0], vertices[0, 0])
+y_P2 = np.append(vertices[:, 1], vertices[0, 1])
 
 # Plotting:
 fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
@@ -86,6 +88,7 @@ ax.plot(x_RO_max, yp_RO_max, 'g', label="RO_max")
 ax.plot(x_RO_max, yn_RO_max, 'g')
 ax.plot(x_RO_quantile, yp_RO_quantile, 'b', label="RO_quantile")
 ax.plot(x_RO_quantile, yn_RO_quantile, 'b')
+ax.plot(x_P2, y_P2, label='P2')
 ax.legend()
 
 # Set the extra space around the edges of the plot to zero:
