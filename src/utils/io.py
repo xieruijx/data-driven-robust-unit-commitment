@@ -165,16 +165,53 @@ class IO(object):
         return xlx, xly, xux, xuy, ylx, yly, yux, yuy, lb, ub
     
     @staticmethod
+    def ineq_norm(pA, pB):
+        """
+        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Normalize pA
+        """
+        pAnorm = np.sqrt(pA[:, 0] * pA[:, 0] + pA[:, 1] * pA[:, 1])
+        pA[:, 0] = pA[:, 0] / pAnorm
+        pA[:, 1] = pA[:, 1] / pAnorm
+        pB = pB / pAnorm
+        return pA, pB
+    
+    @staticmethod
+    def ineq_polyhedron(pA, pB):
+        """
+        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Delete the abundant constraint
+        Output pA p >= pB
+        """
+        pA, pB = IO().ineq_norm(pA, pB)
+
+        num_con = pA.shape[0] + 1
+        while pA.shape[0] < num_con:
+            num_con = pA.shape[0]
+            for i in range(pA.shape[0]):
+                pAn = np.delete(pA, i, axis=0)
+                pBn = np.delete(pB, i)
+                m = gp.Model('m')
+                x = m.addMVar((2,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
+                p = m.addMVar((2,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
+                m.addConstr(pA[i, :] @ x == pB[i])
+                m.addConstr(pAn @ p >= pBn)
+                m.setObjective(gp.quicksum((x - p) * (x - p)), GRB.MINIMIZE)
+                m.optimize()
+                if m.ObjVal > 1e-5:
+                    pA = pAn
+                    pB = pBn
+                    break
+        return pA, pB
+    
+    @staticmethod
     def ineq2vertex(pA, pB):
         """
         Input the 2-dimentional compact polyhedron expressed by pA p >= pB
         Output the vertices in shape (-1, 2)
         No abundant constraint
         """
-        pAnorm = np.sqrt(pA[:, 0] * pA[:, 0] + pA[:, 1] * pA[:, 1])
-        pA[:, 0] = pA[:, 0] / pAnorm
-        pA[:, 1] = pA[:, 1] / pAnorm
-        pB = pB / pAnorm
+        pA, pB = IO().ineq_norm(pA, pB)
 
         pA1p = pA[pA[:, 1] >= 0, :]
         pB1p = pB[pA[:, 1] >= 0]
@@ -196,8 +233,8 @@ class IO(object):
         for i in range(num_con - 1):
             vertices[i, 0] = (pBsort[i] * pAsort[i + 1, 1] - pBsort[i + 1] * pAsort[i, 1]) / (pAsort[i, 0] * pAsort[i + 1, 1] - pAsort[i, 1] * pAsort[i + 1, 0])
             vertices[i, 1] = (pBsort[i] * pAsort[i + 1, 0] - pBsort[i + 1] * pAsort[i, 0]) / (pAsort[i, 1] * pAsort[i + 1, 0] - pAsort[i, 0] * pAsort[i + 1, 1])
-        vertices[-1, 0] = (pBsort[-1] * pAsort[0, 1] - pBsort[1] * pAsort[-1, 1]) / (pAsort[-1, 0] * pAsort[0, 1] - pAsort[-1, 1] * pAsort[0, 0])
-        vertices[-1, 1] = (pBsort[-1] * pAsort[0, 0] - pBsort[1] * pAsort[-1, 0]) / (pAsort[-1, 1] * pAsort[0, 0] - pAsort[-1, 0] * pAsort[0, 1])
+        vertices[-1, 0] = (pBsort[-1] * pAsort[0, 1] - pBsort[0] * pAsort[-1, 1]) / (pAsort[-1, 0] * pAsort[0, 1] - pAsort[-1, 1] * pAsort[0, 0])
+        vertices[-1, 1] = (pBsort[-1] * pAsort[0, 0] - pBsort[0] * pAsort[-1, 0]) / (pAsort[-1, 1] * pAsort[0, 0] - pAsort[-1, 0] * pAsort[0, 1])
 
         print(vertices)
         
@@ -230,9 +267,10 @@ class IO(object):
                        [-1, 0],
                        [0, -1]]) # pA p >= pB
         pB = np.array([pmin[0], pmin[1], -pmax[0], -pmax[1]])
-        pB = np.array([-4, -3, -2, -1])
+        pB = np.array([-4, -4, -4, -4])
         
         while True:
+            pA, pB = IO().ineq_polyhedron(pA, pB)
             vertices = IO().ineq2vertex(pA, pB)
 
             num_v = len(vertices)
@@ -254,8 +292,9 @@ class IO(object):
             if distance < 1e-5:
                 break
             a = xv - v
-            pA = np.concatenate((pA, - a.reshape((1, 2))), axis=0)
-            pB = np.append(pB, - a @ xv)
+            a = a / np.sqrt(np.sum(a * a))
+            pA = np.concatenate((pA, a.reshape((1, 2))), axis=0)
+            pB = np.append(pB, a @ xv)
             print(distance)
             print(vertices)
             print(pA)

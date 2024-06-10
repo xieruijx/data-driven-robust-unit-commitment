@@ -23,10 +23,10 @@ parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
 #                     False, False, False, False, False, False, False,
 #                     False, False, False, False] # Only 2 loads are uncertain
 
-b_sum = True # True for sum across periods, False for one period
-index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
-# b_sum = False
-# index_uncertainty = [160, 161]
+# b_sum = True # True for sum across periods, False for one period
+# index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
+b_sum = False
+index_uncertainty = [160, 161]
 
 # weight_optimize = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
@@ -74,10 +74,10 @@ vertices = IO().projection_polyhedron(index_uncertainty, coefficients, pmin, pma
 
 # Plotting:
 fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
-# ax.plot(xlx, xly, 'k', label="Bound")
-# ax.plot(xux, xuy, 'k')
-# ax.plot(ylx, yly, 'k')
-# ax.plot(yux, yuy, 'k')
+ax.plot(xlx, xly, 'k', label="Bound")
+ax.plot(xux, xuy, 'k')
+ax.plot(ylx, yly, 'k')
+ax.plot(yux, yuy, 'k')
 ax.plot(x_Proposed1, yp_Proposed1, 'y', label='Proposed1')
 ax.plot(x_Proposed1, yn_Proposed1, 'y')
 ax.plot(x_P1, yp_P1, 'r', label="P1")
