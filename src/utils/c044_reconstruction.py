@@ -40,6 +40,7 @@ class C044(object):
         # Get radius and feasible uncertainty data
         rank = CombHandler().get_rank(num_data, epsilon, delta)
         radius = cost[np.argsort(cost)[rank - 1]]
+        u_data_outside = u_data[np.argsort(cost)[rank:]]
         u_data = u_data[np.argsort(cost)[:rank]]
 
         try:
@@ -54,8 +55,8 @@ class C044(object):
             numue = umodel.NumConstrs
             umodel.addConstr(Ariy @ uy >= Bri - Arixc @ sxc, name='ri')
             umodel.addConstr(radius >= Cdxb @ sxb + Cdxc @ sxc + Cry @ uy, name='obj')
-            umodel.setObjective(0, GRB.MINIMIZE)
-            umodel.optimize()
+            umodel.setObjective(gp.quicksum(uu * uu), GRB.MAXIMIZE)
+            umodel.update()
 
             A = umodel.getA()
             B = np.array(umodel.getAttr('RHS', umodel.getConstrs()))
@@ -83,5 +84,5 @@ class C044(object):
         except AttributeError:
             print("Encountered an attribute error")
 
-        return radius, u_data, coefficients
+        return radius, u_data, coefficients, u_data_outside
     

@@ -187,7 +187,6 @@ class Project(object):
                        [-1, 0],
                        [0, -1]]) # pA p >= pB
         pB = np.array([pmin[0], pmin[1], -pmax[0], -pmax[1]])
-        pB = np.array([-1e3, -1e3, -1e3, -1e3])
         
         while True:
             pA, pB = Project().ineq_polyhedron(pA, pB)
@@ -199,7 +198,7 @@ class Project(object):
             v = vertices[0, :]
             for i in range(num_v):
                 m = gp.Model('m')
-                u = m.addMVar((dim_u,), lb=0, ub=1, vtype=GRB.CONTINUOUS)
+                u = m.addMVar((dim_u,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
                 y = m.addMVar((dim_y,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
                 m.addConstr(Aueu @ u + Auey @ y == Bue, name='e')
                 m.addConstr(Auiy @ y >= Bui, name='i')
@@ -210,7 +209,7 @@ class Project(object):
                     xv = Eu @ u.X
                     v = vertices[i, :]
                     distance = m.ObjVal
-            if distance < 1e-5:
+            if distance < 1e-6:
                 break
             a = xv - v
             a = a / np.sqrt(np.sum(a * a))

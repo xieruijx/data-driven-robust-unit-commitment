@@ -13,23 +13,19 @@ index_u_l_predict = 0
 type_u_l = 'test'
 
 parameter = Case().case_ieee30_parameter()
-# parameter['u_select'] = [False, True, True, False, False, False, False,
-#                     False, False, False, False, False, False, False,
-#                     False, False, False, False, False, False, False,
-#                     False, False, False, False] # Only 2 loads are uncertain
+parameter['u_select'] = [False, True, True, False, False, False, False,
+                    False, False, False, False, False, False, False,
+                    False, False, False, False, False, False, False,
+                    False, False, False, False] # Only 2 loads are uncertain
 parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
-# parameter_epsilon0['u_select'] = [False, True, True, False, False, False, False,
-#                     False, False, False, False, False, False, False,
-#                     False, False, False, False, False, False, False,
-#                     False, False, False, False] # Only 2 loads are uncertain
+parameter_epsilon0['u_select'] = [False, True, True, False, False, False, False,
+                    False, False, False, False, False, False, False,
+                    False, False, False, False, False, False, False,
+                    False, False, False, False] # Only 2 loads are uncertain
 
 Eu = np.zeros((2, sum(parameter['u_select']) * parameter['horizon']))
-# index_uncertainty = [0, 1] # b_sum = True; load 0-13, wind 14-15
-# Eu[0, index_uncertainty[0]:-1:(dim_u // 24)] = 1
-# Eu[1, index_uncertainty[1]:-1:(dim_u // 24)] = 1
-index_uncertainty = [160, 161]
-Eu[0, index_uncertainty[0]] = 1
-Eu[1, index_uncertainty[1]] = 1
+Eu[0, 0:14:2] = 1
+Eu[1, 1:14:2] = 1
 
 # weight_optimize = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
@@ -56,7 +52,7 @@ error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = 
 x_RO_quantile, yp_RO_quantile, yn_RO_quantile = Project().projection_ellipse(error_mu, error_sigma, error_rho, u_l_predict, Eu, num_points=400)
 
 ## P2: The data-driven RO method using the weight optimized by minimizing the error measure
-# coefficients = optimization.weight2polyhedron(parameter, weight_error, index_u_l_predict, 'case_ieee30', type_u_l)
+# coefficients, u_data_outside = optimization.weight2polyhedron(parameter, weight_error, index_u_l_predict, 'case_ieee30', type_u_l)
 # Aueu = coefficients['Aueu'].todense()
 # Auey = coefficients['Auey'].todense()
 # Auiy = coefficients['Auiy'].todense()
@@ -67,6 +63,8 @@ x_RO_quantile, yp_RO_quantile, yn_RO_quantile = Project().projection_ellipse(err
 # np.save('./data/temp/Auiy_P2.npy', Auiy)
 # np.save('./data/temp/Bue_P2.npy', Bue)
 # np.save('./data/temp/Bui_P2.npy', Bui)
+# np.save('./data/temp/u_data_outside_P2.npy', u_data_outside)
+
 coefficients = {}
 coefficients['Aueu'] = np.load('./data/temp/Aueu_P2.npy')
 coefficients['Auey'] = np.load('./data/temp/Auey_P2.npy')

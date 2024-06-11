@@ -58,7 +58,7 @@ class Optimization(object):
                 _, sxb1, sxc1, LBUB1, time1, interpret = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
 
             if type_r == 'n1': # Include reconstruction and CCG for polyhedral uncertainty set
-                _, u_data, coefficients = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
+                _, u_data, coefficients, _ = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
                 if not b_faster:
                     _, _, sxb2, sxc2, LBUB2, time2, interpret = C045().c045_CCG_n2(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data)
                 else:
@@ -181,6 +181,6 @@ class Optimization(object):
         else:
             _, sxb1, sxc1, LBUB1, _, _ = C043().c043_CCG_n1_faster(LargeNumber, Tolerance, TimeLimitFC, TimeLimitSP, MaxIter, EPS, mpc, coefficients, u_data_train, b_display_SP)
 
-        _, _, coefficients = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
+        _, _, coefficients, u_data_outside = C044().c044_reconstruction(epsilon, delta, coefficients, u_data_train_n2, sxb1, sxc1, LBUB1)
 
-        return coefficients
+        return coefficients, u_data_outside
