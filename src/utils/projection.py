@@ -29,29 +29,35 @@ class Project(object):
         return x, yp, yn
     
     @staticmethod
-    def projection_ellipse(index_uncertainty, error_mu, error_sigma, error_rho, u_l_predict, b_sum=True, num_points=400):
+    def projection_ellipse(error_mu, error_sigma, error_rho, u_l_predict, Eu, num_points=400):
         """
         Project the multi-dimensional ellipsoid to a two-dimensional ellipse
         """
-        if b_sum:
-            u_l = u_l_predict.reshape((24, -1)) - error_mu.reshape((24, -1))
-            x0 = np.sum(u_l[:, index_uncertainty[0]])
-            y0 = np.sum(u_l[:, index_uncertainty[1]])
+        dim_u = Eu.shape[1]
 
-            P = np.eye(error_mu.shape[0])
-            for i in range(u_l.shape[1]):
-                P[i, i + 1: 24: -1] = - 1
-            sigma = P.T @ np.linalg.inv(error_sigma) @ P
-        else:
-            u_l = u_l_predict - error_mu
-            x0 = u_l[index_uncertainty[0]]
-            y0 = u_l[index_uncertainty[1]]
+        u_l = u_l_predict - error_mu
+        x0 = Eu[0, :] @ u_l
+        y0 = Eu[1, :] @ u_l
+        
+        basis = np.zeros((dim_u, dim_u))
+        basis[:2, :] = Eu
+        basis_element = [0, 0]
+        basis_element[0] = np.nonzero(Eu[0, :])[0][0]
+        basis_element[1] = np.nonzero(Eu[1, :] - Eu[0, :] * Eu[1, basis_element[0]] / Eu[0, basis_element[0]])[0][0]
+        element = 2
+        for i in range(dim_u):
+            if i == basis_element[0] or i == basis_element[1]:
+                continue
+            else:
+                basis[element, i] = 1
+                element = element + 1
 
-            sigma = np.linalg.inv(error_sigma)
+        P = np.linalg.inv(basis)
+        sigma = P.T @ np.linalg.inv(error_sigma) @ P
 
-        sigma11 = sigma[index_uncertainty, :][:, index_uncertainty]
-        sigma12 = np.delete(sigma, index_uncertainty, axis=1)[index_uncertainty, :]
-        sigma22 = np.delete(np.delete(sigma, index_uncertainty, axis=0), index_uncertainty, axis=1)
+        sigma11 = sigma[:2, :][:, :2]
+        sigma12 = np.delete(sigma, [0, 1], axis=1)[:2, :]
+        sigma22 = np.delete(np.delete(sigma, [0, 1], axis=0), [0, 1], axis=1)
 
         sigma_p = sigma11 - sigma12 @ np.linalg.inv(sigma22) @ (sigma12.T)
 
@@ -63,22 +69,18 @@ class Project(object):
         return x, yp, yn
     
     @staticmethod
-    def projection_bound(index_uncertainty, error_lb, error_ub, u_lu, u_ll, u_l_predict, b_sum=True):
+    def projection_bound(error_lb, error_ub, u_lu, u_ll, u_l_predict, Eu):
         """
         Project the multi-dimensional bounds to two dimensions
         """
         ul = np.maximum(u_ll, u_l_predict - error_ub)
         uu = np.minimum(u_lu, u_l_predict - error_lb)
 
-        if b_sum:
-            ul = ul.reshape((24, -1))
-            uu = uu.reshape((24, -1))
+        Eup = np.maximum(Eu, 0)
+        Eun = np.minimum(Eu, 0)
 
-            lb = np.sum(ul[:, index_uncertainty], axis=0)
-            ub = np.sum(uu[:, index_uncertainty], axis=0)
-        else:
-            lb = ul[index_uncertainty]
-            ub = uu[index_uncertainty]
+        lb = Eup @ ul + Eun @ uu
+        ub = Eup @ uu + Eun @ ul
 
         xlx = [lb[0], lb[0]]
         xly = [lb[1], ub[1]]
@@ -167,7 +169,7 @@ class Project(object):
         return vertices
 
     @staticmethod
-    def projection_polyhedron(index_uncertainty, coefficients, pmin, pmax, b_sum=True):
+    def projection_polyhedron(coefficients, pmin, pmax, Eu):
         """
         Project the multi-dimensional polyhedron to a two-dimensional polyhedron
         """
@@ -180,20 +182,12 @@ class Project(object):
         dim_u = Aueu.shape[1]
         dim_y = Auey.shape[1]
 
-        Eu = np.zeros((2, dim_u))
-        if b_sum:
-            Eu[0, index_uncertainty[0]:-1:24] = 1
-            Eu[1, index_uncertainty[1]:-1:24] = 1
-        else:
-            Eu[0, index_uncertainty[0]] = 1
-            Eu[1, index_uncertainty[1]] = 1
-
         pA = np.array([[1, 0],
                        [0, 1],
                        [-1, 0],
                        [0, -1]]) # pA p >= pB
         pB = np.array([pmin[0], pmin[1], -pmax[0], -pmax[1]])
-        pB = np.array([-4, -4, -4, -4])
+        pB = np.array([-1e3, -1e3, -1e3, -1e3])
         
         while True:
             pA, pB = Project().ineq_polyhedron(pA, pB)
