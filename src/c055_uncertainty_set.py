@@ -17,11 +17,15 @@ parameter['u_select'] = [False, True, True, False, False, False, False,
                     False, False, False, False, False, False, False,
                     False, False, False, False, False, False, False,
                     False, False, False, False] # Only 2 loads are uncertain
+# parameter['TimeLimitFC'] = 100 # Time limit of the feasibility check problem
+# parameter['TimeLimitSP'] = 100 # Time limit of the subproblem
 parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
 parameter_epsilon0['u_select'] = [False, True, True, False, False, False, False,
                     False, False, False, False, False, False, False,
                     False, False, False, False, False, False, False,
                     False, False, False, False] # Only 2 loads are uncertain
+# parameter_epsilon0['TimeLimitFC'] = 100 # Time limit of the feasibility check problem
+# parameter_epsilon0['TimeLimitSP'] = 100 # Time limit of the subproblem
 
 Eu = np.zeros((2, sum(parameter['u_select']) * parameter['horizon']))
 Eu[0, 0:14:2] = 1
@@ -75,29 +79,32 @@ vertices = Project().projection_polyhedron(coefficients, pmin, pmax, Eu)
 x_P2 = np.append(vertices[:, 0], vertices[0, 0])
 y_P2 = np.append(vertices[:, 1], vertices[0, 1])
 
+fontsize = 12
 # Plotting:
-fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=80)
+fig, ax = plt.subplots(1, 1)
 ax.plot(xlx, xly, 'k', label="Bound")
 ax.plot(xux, xuy, 'k')
 ax.plot(ylx, yly, 'k')
 ax.plot(yux, yuy, 'k')
-ax.plot(x_Proposed1, yp_Proposed1, 'y', label='Proposed1')
-ax.plot(x_Proposed1, yn_Proposed1, 'y')
+ax.plot(x_RO_max, yp_RO_max, 'g', label="RO1")
+ax.plot(x_RO_max, yn_RO_max, 'g')
+ax.plot(x_RO_quantile, yp_RO_quantile, 'b', label="RO2")
+ax.plot(x_RO_quantile, yn_RO_quantile, 'b')
 ax.plot(x_P1, yp_P1, 'r', label="P1")
 ax.plot(x_P1, yn_P1, 'r')
-ax.plot(x_RO_max, yp_RO_max, 'g', label="RO_max")
-ax.plot(x_RO_max, yn_RO_max, 'g')
-ax.plot(x_RO_quantile, yp_RO_quantile, 'b', label="RO_quantile")
-ax.plot(x_RO_quantile, yn_RO_quantile, 'b')
-ax.plot(x_P2, y_P2, label='P2')
+ax.plot(x_Proposed1, yp_Proposed1, 'y', label='P2_1')
+ax.plot(x_Proposed1, yn_Proposed1, 'y')
+ax.plot(x_P2, y_P2, label='P2_2')
 ax.legend()
 
 # Set the extra space around the edges of the plot to zero:
 ax.set_aspect('equal')
 
 # Set the labels for the x and y axes:
-ax.set_xlabel("X", fontsize=14)
-ax.set_ylabel("Y", fontsize=14)
+ax.set_xlabel("First dimension (MW)", fontsize=fontsize)
+ax.set_ylabel("Second dimension (MW)", fontsize=fontsize)
+
+ax.grid(linestyle='--')
 
 # Finally, show the plot:
 plt.show()
