@@ -8,7 +8,7 @@ from utils.io import IO
 optimization = Optimization()
 
 ## Settings
-index_u_l_predict = 0
+index_u_l_predict = 1
 type_u_l = 'test'
 
 parameter = Case().case_ieee30_parameter()

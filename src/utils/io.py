@@ -76,5 +76,5 @@ class IO(object):
 
         df = pd.DataFrame(outputs, index=['train quantile', 'validation quantile', 'test quantile', 'objective', 'time']).T
         print(df)
-        df.to_csv(folder_outputs + str(num_bus) + '/outputs.csv')
+        df.to_csv(folder_outputs + str(num_bus) + '/outputs_' + type_u_l + str(index_u_l_predict) + '.csv')
     

@@ -3,6 +3,7 @@ import gurobipy as gp
 from gurobipy import GRB
 
 from utils.case import Case
+from utils.uncertainty import Uncertainty
 
 class C042(object):
     """
@@ -15,7 +16,6 @@ class C042(object):
         Calculate the uncertainty data from real and predict data
         Revise it into the uncertainty set according to requirements
         """
-        case = Case()
 
         real = real[:, mpc['u_select']]
         predict = predict[:, mpc['u_select']]
@@ -28,14 +28,14 @@ class C042(object):
         # b_ellipsoid = True: Revise the point into the ellipsoid uncertainty set if it is not
         # b_ellipsoid = False: Revise the point to satisfy the bounds if it is not
         for i in range(num_data):
-            if not case.test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=b_ellipsoid):
+            if not Uncertainty().test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=b_ellipsoid):
                 print('Data {} is not in the uncertainty set.'.format(i))
-                u_data[i, :] = case.revise_u(u_data[i, :], mpc, EPS, b_print=True, b_ellipsoid=b_ellipsoid)
+                u_data[i, :] = Uncertainty().revise_u(u_data[i, :], mpc, EPS, b_print=True, b_ellipsoid=b_ellipsoid)
 
         # Test whether the points are in the ellipsoid uncertainty set
         num_not_in_uncertainty_set = 0
         for i in range(num_data):
-            if not case.test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=True):
+            if not Uncertainty().test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=True):
                 print('Data {} is not in the ellipsoid uncertainty set.'.format(i))
                 num_not_in_uncertainty_set += 1
         print('{} out of {} data are not in the ellipsoid uncertainty set.'.format(num_not_in_uncertainty_set, num_data))
@@ -45,7 +45,7 @@ class C042(object):
                 raise RuntimeError('Failure of uncertainty revision')
         else:
             for i in range(num_data):
-                if not case.test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=False):
+                if not Uncertainty().test_u(u_data[i, :], mpc, b_print=True, b_ellipsoid=False):
                     raise RuntimeError('Failure of uncertainty revision')
 
         return u_data
