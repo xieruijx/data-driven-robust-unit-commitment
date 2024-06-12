@@ -62,6 +62,9 @@ class Case(object):
         """
         mpc = Case().case_ieee30()
 
+        # Modify load
+        mpc['bus'][:, 2] = mpc['bus'][:, 2] * 1.1
+
         mpc['n_t'] = 24 # Number of periods
 
         #	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_agc	ramp_10	ramp_30	ramp_q	apf ramp
@@ -78,12 +81,12 @@ class Case(object):
 
         #	2	startup	shutdown	n	c(n-1)	...	c0 reserve-up reserve-down ramp-up ramp-down
         mpc['gencost'] = np.array([
-            [2,	1,	1,	3,	0,	27,	0, 5, 5, 27, 0],
-	        [2,	1,	1,	3,	0,	37,	0, 5, 5, 37, 0],
-	        [2,	1,	1,	3,	0,	38,	0, 5, 5, 40, 0],
-	        [2,	1,	1,	3,	0,	39,	0, 5, 5, 45, 0],
-            [2,	1,	1,	3,	0,	40,	0, 5, 5, 45, 0],
-	        [2,	1,	1,	3,	0,	41,	0, 5, 5, 45, 0]
+            [2,	1,	1,	3,	0,	30,	0, 5, 5, 30, 0],
+	        [2,	1,	1,	3,	0,	35,	0, 5, 5, 35, 0],
+	        [2,	1,	1,	3,	0,	35,	0, 20, 5, 40, 0],
+	        [2,	1,	1,	3,	0,	35,	0, 20, 5, 45, 0],
+            [2,	1,	1,	3,	0,	40,	0, 20, 5, 40, 0],
+	        [2,	1,	1,	3,	0,	40,	0, 20, 5, 45, 0]
         ])
 
         #   branch

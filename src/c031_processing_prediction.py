@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import random
 
-random.seed(0)
+random.seed(2)
 
 horizon = 24
 sequence_length = 192

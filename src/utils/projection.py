@@ -82,14 +82,14 @@ class Project(object):
         lb = Eup @ ul + Eun @ uu
         ub = Eup @ uu + Eun @ ul
 
-        xlx = [lb[0], lb[0]]
-        xly = [lb[1], ub[1]]
-        xux = [ub[0], ub[0]]
-        xuy = [lb[1], ub[1]]
-        ylx = [lb[0], ub[0]]
-        yly = [lb[1], lb[1]]
-        yux = [lb[0], ub[0]]
-        yuy = [ub[1], ub[1]]
+        xlx = np.array([lb[0], lb[0]])
+        xly = np.array([lb[1], ub[1]])
+        xux = np.array([ub[0], ub[0]])
+        xuy = np.array([lb[1], ub[1]])
+        ylx = np.array([lb[0], ub[0]])
+        yly = np.array([lb[1], lb[1]])
+        yux = np.array([lb[0], ub[0]])
+        yuy = np.array([ub[1], ub[1]])
 
         return xlx, xly, xux, xuy, ylx, yly, yux, yuy, lb, ub
     

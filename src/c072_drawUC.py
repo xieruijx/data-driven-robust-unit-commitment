@@ -8,30 +8,27 @@ type_u_l = 'test'
 num_unit = 6
 type_method = 'P2'
 
-for index_unit in range(num_unit):
+fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(9, 5))
+
+for index_unit, ax in enumerate(axs.flatten()):
 
     x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.read_strategy(30, index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/')
+    x_pg = x_pg * 100
+    x_rp = x_rp * 100
+    x_rn = x_rn * 100
+    y_rp = y_rp * 100
+    y_rn = y_rn * 100
 
-    # creating a fake data as example
     time = np.linspace(0, 23, 24)
 
-    # Creating the figure
-    plt.figure(figsize=(7,4))
+    ax.plot(time, x_pg[:, index_unit], 'b*-', label='Pre-dispatch')
+    ax.fill_between(time, x_pg[:, index_unit] - x_rn[:, index_unit], x_pg[:, index_unit] + x_rp[:, index_unit], 
+                    label='Reserve', color='gray', alpha=0.4)
+    ax.plot(time, x_pg[:, index_unit] + y_rp[:, index_unit] - y_rn[:, index_unit], 'g2-', label='Re-dispatch')
 
-    # Plotting day ahead power output schedule
-    plt.plot(time, x_pg[:, index_unit], 'b1-', label='Pre-dispatch')
-
-    # plotting reserve region with fill between function
-    plt.fill_between(time, x_pg[:, index_unit] - x_rn[:, index_unit], x_pg[:, index_unit] + x_rp[:, index_unit], 
-                    label='Reserve Region', color='gray', alpha=0.4)
-
-    # Plotting re-dispatch power curve
-    plt.plot(time, x_pg[:, index_unit] + y_rp[:, index_unit] - y_rn[:, index_unit], 'g2-', label='Worst-case re-dispatch')
-
-    plt.xlabel('Time (h)')
-    plt.ylabel('Power Output (100 MW)')
-    plt.title('Unit ' + str(index_unit))
-    plt.legend()
-    plt.grid(True)
+    ax.set_xlabel('Time (h)')
+    ax.set_ylabel('Power of unit ' + str(index_unit + 1) + ' (MW)')
+    ax.legend()
+    ax.grid(linestyle='--')
 
 plt.show()
