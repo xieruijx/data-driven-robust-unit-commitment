@@ -3,7 +3,7 @@ import time
 import gurobipy as gp
 from gurobipy import GRB
 
-from utils.case import Case
+from utils.uncertainty import Uncertainty
 
 class C045(object):
     """
@@ -19,9 +19,6 @@ class C045(object):
 
         ## Time
         time_start = time.time()
-
-        ## Load case
-        case = Case()
 
         ## Load compact form
         Adexb = coefficients['Adexb']
@@ -162,8 +159,8 @@ class C045(object):
                     su = uFC2.X
 
                 print('test_u before FC')
-                if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                    su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                    su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                 # FC: Bilinear program
                 FC = gp.Model('Feasibility')
                 uFC = FC.addMVar((Areu.shape[1],), lb=-float('inf'), vtype=GRB.CONTINUOUS)
@@ -191,13 +188,13 @@ class C045(object):
                 FC.optimize()
 
                 print('test_u after FC')
-                if case.test_u(uFC.X, mpc, b_print=True, b_ellipsoid=False):
+                if Uncertainty().test_u(uFC.X, mpc, b_print=True, b_ellipsoid=False):
                     print('FC: su is in the uncertainty set.')
                     su = uFC.X
                     FCVal = FC.ObjVal
                 else:
                     print('FC: su is not in the uncertainty set.')
-                    su = case.revise_u(uFC.X, mpc, EPS, b_print=True, b_ellipsoid=False) # Revise and mountain climbing
+                    su = Uncertainty().revise_u(uFC.X, mpc, EPS, b_print=True, b_ellipsoid=False) # Revise and mountain climbing
                     FC1.setObjective((Bre - Areu @ su - Arexc @ sxc) @ muFC1 + (Bri - Arixc @ sxc) @ etaFC1, GRB.MAXIMIZE)
                     FC1.optimize()
                     smu = muFC1.X
@@ -212,8 +209,8 @@ class C045(object):
                 
                 if FCVal > EPS:
                     print('test_u after FC gap')
-                    if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                        su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                    if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                        su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                     ulist.append(su)
                 else:
                     # SP: Mountain climbing for initiation
@@ -228,8 +225,8 @@ class C045(object):
                         su = uSP2.X
 
                     print('test_u before SP')
-                    if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                        su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                    if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                        su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                     ## Sub problem: MILP
                     SP = gp.Model('Sub')
                     uSP = SP.addMVar((Areu.shape[1],), lb=-float('inf'), vtype=GRB.CONTINUOUS) 
@@ -262,10 +259,10 @@ class C045(object):
 
                     print('SP gap: {}'.format(SP.MIPGap))
                     print('test_u after SP')
-                    if case.test_u(uSP.X, mpc, b_print=True, b_ellipsoid=False):
+                    if Uncertainty().test_u(uSP.X, mpc, b_print=True, b_ellipsoid=False):
                         SPVal = SP.ObjVal
                     else:
-                        su = case.revise_u(uSP.X, mpc, EPS, b_print=True, b_ellipsoid=False)
+                        su = Uncertainty().revise_u(uSP.X, mpc, EPS, b_print=True, b_ellipsoid=False)
                         SP1.setObjective((Bre - Areu @ su - Arexc @ sxc) @ muSP1 + (Bri - Arixc @ sxc) @ etaSP1, GRB.MAXIMIZE)
                         SP1.optimize()
                         smu = muSP1.X
@@ -284,8 +281,8 @@ class C045(object):
                         break
                     else:
                         print('test_u before appending su')
-                        if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                            su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                        if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                            su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                         ulist.append(su)       
                     
                 # Add constraints to MP
@@ -325,9 +322,6 @@ class C045(object):
 
         ## Time
         time_start = time.time()
-
-        ## Load case
-        case = Case()
 
         ## Load compact form
         Adexb = coefficients['Adexb']
@@ -444,8 +438,8 @@ class C045(object):
                     su = uFC2.X
 
                 print('test_u after mountain climbing FC')
-                if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                    su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                    su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                 FCVal = (Bre - Areu @ su - Arexc @ sxc) @ smu + (Bri - Arixc @ sxc) @ seta
 
                 print('FCObj (revised to be feasible): {}'.format(FCVal))
@@ -465,8 +459,8 @@ class C045(object):
                         su = uSP2.X
 
                     print('test_u after mountain climbing SP')
-                    if not case.test_u(su, mpc, b_print=True, b_ellipsoid=False):
-                        su = case.revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
+                    if not Uncertainty().test_u(su, mpc, b_print=True, b_ellipsoid=False):
+                        su = Uncertainty().revise_u(su, mpc, EPS, b_print=True, b_ellipsoid=False)
                     SPVal = (Bre - Areu @ su - Arexc @ sxc) @ smu + (Bri - Arixc @ sxc) @ seta
                     
                     UB[Iter] = MPObjX + SPVal
