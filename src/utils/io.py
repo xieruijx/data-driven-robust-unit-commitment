@@ -49,12 +49,24 @@ class IO(object):
         """
         train_cost = np.loadtxt(folder_outputs + str(num_bus) + '/train_cost_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
         train_q = train_cost[np.argsort(train_cost)[np.ceil((1 - epsilon) * train_cost.shape[0]).astype(int) - 1]]
+        train_r = - np.sum(np.isinf(train_cost)) / train_cost.shape[0] + 1
 
         validation_cost = np.loadtxt(folder_outputs + str(num_bus) + '/validation_cost_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
         validation_q = validation_cost[np.argsort(validation_cost)[np.ceil((1 - epsilon) * validation_cost.shape[0]).astype(int) - 1]]
+        validation_r = - np.sum(np.isinf(validation_cost)) / validation_cost.shape[0] + 1
 
         test_cost = np.loadtxt(folder_outputs + str(num_bus) + '/test_cost_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
         test_q = test_cost[np.argsort(test_cost)[np.ceil((1 - epsilon) * test_cost.shape[0]).astype(int) - 1]]
+        test_r = - np.sum(np.isinf(test_cost)) / test_cost.shape[0] + 1
+
+        if type_u_l == 'train':
+            cost = train_cost[index_u_l_predict]
+        elif type_u_l == 'validation':
+            cost = validation_cost[index_u_l_predict]
+        elif type_u_l == 'test':
+            cost = test_cost[index_u_l_predict]
+        else:
+            raise RuntimeError('The type of u_l (type_u_l) is wrong')
 
         LBUB2 = np.loadtxt(folder_outputs + str(num_bus) + '/LBUB2_' + type_u_l + str(index_u_l_predict) + name_method + '.txt', ndmin=2)
         obj = LBUB2[-1, 0]
@@ -62,10 +74,10 @@ class IO(object):
         time = np.loadtxt(folder_outputs + str(num_bus) + '/time_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
         time = np.sum(time)
 
-        return [train_q, validation_q, test_q, obj, time]
+        return [train_q, train_r, validation_q, validation_r, test_q, test_r, cost, obj, time]
     
     @staticmethod
-    def organize_methods(num_bus, index_u_l_predict, type_u_l, epsilon=0.05, folder_outputs='./results/outputs/', methods=['P1', 'P2', 'Proposed', 'RO_max', 'RO_quantile', 'RO_data', 'SP_MILP', 'SP_approx']):
+    def organize_methods(num_bus, index_u_l_predict, type_u_l, epsilon=0.05, folder_outputs='./results/outputs/', methods=['P1', 'P2', 'Proposed', 'RO_max', 'RO_quantile', 'SP_approx']):
         """
         Read and organize the outputs of methods
         """
@@ -74,7 +86,7 @@ class IO(object):
             output = IO().organize_method(num_bus, index_u_l_predict, type_u_l, epsilon, method, folder_outputs)
             outputs[method] = output
 
-        df = pd.DataFrame(outputs, index=['train quantile', 'validation quantile', 'test quantile', 'objective', 'time']).T
-        print(df)
+        df = pd.DataFrame(outputs, index=['train quantile', 'train rate', 'validation quantile', 'validation rate', 'test quantile', 'test rate', 'cost', 'objective', 'time']).T
+        print(df[['test quantile', 'test rate', 'cost', 'objective', 'time']])
         df.to_csv(folder_outputs + str(num_bus) + '/outputs_' + type_u_l + str(index_u_l_predict) + '.csv')
     

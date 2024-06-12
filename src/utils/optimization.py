@@ -80,8 +80,8 @@ class Optimization(object):
             LBUB2 = LBUB1
             time2 = 0
 
-        validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb2, sxc2, LBUB2)
-        test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb2, sxc2, LBUB2)
+        validation_cost = C046().c046_evaluate_faster(u_data_validation, coefficients, sxb2, sxc2, LBUB2, b_sort=False)
+        test_cost = C046().c046_evaluate_faster(u_data_test, coefficients, sxb2, sxc2, LBUB2, b_sort=False)
         train_cost = C046().c046_evaluate_faster(u_data_train_original, coefficients, sxb2, sxc2, LBUB2, b_sort=False)
         train_order = np.argsort(train_cost)
 

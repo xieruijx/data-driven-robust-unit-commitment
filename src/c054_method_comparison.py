@@ -38,14 +38,6 @@ IO().output_UC(30, index_u_l_predict, type_u_l, weight_optimize, train_cost, tra
 validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n_q', None, index_u_l_predict, 'case_ieee30', type_u_l)
 IO().output_UC(30, index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_quantile', folder_outputs='./results/outputs/', folder_strategies='./results/strategies/')
 
-## RO_data: The data-driven SP method using approximate method to solve
-validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_epsilon0, weight_optimize, 'n1', 'approx', index_u_l_predict, 'case_ieee30', type_u_l)
-IO().output_UC(30, index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_data', folder_outputs='./results/outputs/', folder_strategies='./results/strategies/')
-
-## SP_MILP: The data-driven SP method using MILP to solve
-validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n1', 'MILP', index_u_l_predict, 'case_ieee30', type_u_l)
-IO().output_UC(30, index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'SP_MILP', folder_outputs='./results/outputs/', folder_strategies='./results/strategies/')
-
 ## SP_approx: The data-driven SP method using approximate method to solve
 validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n1', 'approx', index_u_l_predict, 'case_ieee30', type_u_l)
 IO().output_UC(30, index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'SP_approx', folder_outputs='./results/outputs/', folder_strategies='./results/strategies/')
