@@ -3,7 +3,7 @@ import numpy as np
 
 from utils.io import IO
 
-index_u_l_predict = 0
+index_u_l_predict = 16
 type_u_l = 'test'
 num_unit = 6
 type_method = 'P2'
@@ -26,9 +26,11 @@ for index_unit, ax in enumerate(axs.flatten()):
                     label='Reserve', color='gray', alpha=0.4)
     ax.plot(time, x_pg[:, index_unit] + y_rp[:, index_unit] - y_rn[:, index_unit], 'g2-', label='Re-dispatch')
 
+    if index_unit == 0:
+        ax.legend()
+
     ax.set_xlabel('Time (h)')
     ax.set_ylabel('Power of unit ' + str(index_unit + 1) + ' (MW)')
-    ax.legend()
     ax.grid(linestyle='--')
 
 plt.show()

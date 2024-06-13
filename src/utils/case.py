@@ -193,6 +193,9 @@ class Case(object):
         """
         mpc = Case().case118()
 
+        # Modify load
+        mpc['bus'][:, 2] = mpc['bus'][:, 2] * 1.0
+
         mpc['n_t'] = 24 # Number of periods
 
         #	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_agc	ramp_10	ramp_30	ramp_q	apf ramp
@@ -213,10 +216,11 @@ class Case(object):
         bus_uncertain_load = [2, 7, 14, 17, 20, 21, 22,
                            23, 24, 28, 43, 44, 48, 50,
                            51, 52, 57, 58, 72, 73, 84]
-        bus_uncertain_wind = [70, 90]
+        bus_uncertain_wind = [30, 37, 49, 77]
         mpc['bus_uncertain'] = bus_uncertain_load + bus_uncertain_wind
         mpc['u_select'] = parameter['u_select']
-        bus_uncertain_load = [b for b, u in zip(bus_uncertain_load, mpc['u_select'][:21]) if u]
+        bus_uncertain_load = [b for b, u in zip(bus_uncertain_load, mpc['u_select'][:len(bus_uncertain_load)]) if u]
+        bus_uncertain_wind = [b for b, u in zip(bus_uncertain_wind, mpc['u_select'][-len(bus_uncertain_wind):]) if u]
         mpc['bus_uncertain'] = [b for b, u in zip(mpc['bus_uncertain'], mpc['u_select']) if u]
         mpc['n_u'] = len(mpc['bus_uncertain']) # Number of uncertainties
 
@@ -224,7 +228,7 @@ class Case(object):
         for i in range(len(bus_uncertain_load)):
             times_uncertain_load[i] = mpc['bus'][bus_uncertain_load[i] - 1, 2] / mpc['baseMVA']
             mpc['bus'][bus_uncertain_load[i] - 1, 2] = 0
-        times_uncertain_wind = np.array([-90, -80]) / mpc['baseMVA']
+        times_uncertain_wind = - 100 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
         mpc['times_uncertain'] = np.concatenate((times_uncertain_load, times_uncertain_wind))
 
         mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))
@@ -242,6 +246,31 @@ class Case(object):
         mpc['u_ll'] = np.zeros(mpc['u_l_predict'].shape)
 
         return mpc
+    
+    @staticmethod
+    def case118_parameter(b_faster=True, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1):
+        """
+        Parameters for the IEEE 30-bus unit commitment computation
+        """
+        parameter = {}
+        parameter['b_faster'] = b_faster # False: MILP; True: Mountain climbing for subproblems in CCG
+        parameter['b_display_SP'] = b_display_SP
+        parameter['num_groups'] = 21
+        parameter['num_wind'] = 4
+        parameter['horizon'] = 24
+        parameter['epsilon'] = epsilon # chance constraint parameter
+        parameter['delta'] = 0.05 # probability guarantee parameter
+        parameter['MaxIter'] = MaxIter # Maximum iteration number of CCG
+        parameter['LargeNumber'] = 1e12 # For the big-M method
+        parameter['Tolerance'] = 1e-3 # Tolerance: UB - LB <= Tolerance * UB
+        parameter['TimeLimitFC'] = TimeLimit # Time limit of the feasibility check problem
+        parameter['TimeLimitSP'] = TimeLimit # Time limit of the subproblem
+        parameter['EPS'] = 1e-8 # A small number for margin
+        parameter['u_select'] = [True, True, True, True, True, True, True,
+                        True, True, True, True, True, True, True,
+                        True, True, True, True, True, True, True,
+                        True, True, True, True] # Only a part of loads and renewables are uncertain
+        return parameter
     
     @staticmethod
     def process_case(mpc):

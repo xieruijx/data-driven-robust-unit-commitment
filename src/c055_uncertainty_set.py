@@ -9,7 +9,7 @@ from utils.projection import Project
 optimization = Optimization()
 
 ## Settings
-index_u_l_predict = 0
+index_u_l_predict = 16
 type_u_l = 'test'
 
 parameter = Case().case_ieee30_parameter()
@@ -28,8 +28,8 @@ parameter_epsilon0['u_select'] = [False, True, True, False, False, False, False,
 # parameter_epsilon0['TimeLimitSP'] = 100 # Time limit of the subproblem
 
 Eu = np.zeros((2, sum(parameter['u_select']) * parameter['horizon']))
-Eu[0, 0:14:2] = 1
-Eu[1, 1:14:2] = 1
+Eu[0, 0:10:2] = 1
+Eu[1, 1:10:2] = 1
 
 # weight_optimize = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')

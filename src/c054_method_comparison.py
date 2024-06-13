@@ -1,4 +1,4 @@
-## Compare different methods: P1, P2, Proposed, RO_max, RO_quantile, RO_data, SP_MILP, SP_approx
+## Compare different methods: P1, P2, Proposed, RO_max, RO_quantile, SP_approx
 import numpy as np
 
 from utils.optimization import Optimization
@@ -8,7 +8,7 @@ from utils.io import IO
 optimization = Optimization()
 
 ## Settings
-index_u_l_predict_set = range(18, 100)
+index_u_l_predict_set = range(31, 100)
 type_u_l = 'test'
 
 parameter = Case().case_ieee30_parameter()
