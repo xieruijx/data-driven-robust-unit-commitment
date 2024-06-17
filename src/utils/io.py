@@ -88,19 +88,21 @@ class IO(object):
         sum_numbers = sum(numbers)
 
         matrix_load = np.zeros((24 * sum(u_select[:num_groups] * 3), sum_numbers))
-        matrix_wind = np.zeros((24 * sum(u_select[num_groups:], sum_numbers)))
+        matrix_wind = np.zeros((24 * sum(u_select[num_groups:]), sum_numbers))
         matrix_weight = np.zeros((2, sum_numbers))
         matrix_cost = np.zeros((sum_numbers,))
 
-        sum = 0
-        for index_u_l_predict in len(numbers):
-            for index_sample in numbers[index_u_l_predict]:
+        index_matrix = 0
+        for index_u_l_predict in range(len(numbers)):
+            for index_sample in range(numbers[index_u_l_predict]):
                 predict_load, predict_wind, weight, cost = IO().read_training_sample(index_u_l_predict, type_u_l, index_sample, u_select, epsilon=epsilon, name_method=name_method, folder_outputs=folder_outputs, folder_strategies=folder_strategies, num_groups=num_groups, num_wind=num_wind)
 
-                matrix_load[:, sum] = predict_load
-                matrix_wind[:, sum] = predict_wind
-                matrix_weight[:, sum] = weight
-                matrix_cost[sum] = cost
+                matrix_load[:, index_matrix] = predict_load
+                matrix_wind[:, index_matrix] = predict_wind
+                matrix_weight[:, index_matrix] = weight
+                matrix_cost[index_matrix] = cost
+
+                index_matrix = index_matrix + 1
         
         np.savetxt(folder_outputs + 'matrix_load.txt', matrix_load)
         np.savetxt(folder_outputs + 'matrix_wind.txt', matrix_wind)
@@ -118,11 +120,11 @@ class IO(object):
         data_wind = np.zeros((24, num_wind))
         df = pd.read_csv('./data/processed/combination/d031_' + type_u_l + '.csv')
         for group in range(num_groups):
-            data_load[:, group, 0] = df['load' + str(group) + '_local'].to_numpy()
-            data_load[:, group, 1] = df['load' + str(group) + '_HFL'].to_numpy()
-            data_load[:, group, 2] = df['load' + str(group) + '_VFL'].to_numpy()
+            data_load[:, group, 0] = df['load' + str(group) + '_local'][(index_u_l_predict * 24):((index_u_l_predict + 1) * 24)].to_numpy()
+            data_load[:, group, 1] = df['load' + str(group) + '_HFL'][(index_u_l_predict * 24):((index_u_l_predict + 1) * 24)].to_numpy()
+            data_load[:, group, 2] = df['load' + str(group) + '_VFL'][(index_u_l_predict * 24):((index_u_l_predict + 1) * 24)].to_numpy()
         for wind in range(num_wind):
-            data_wind[:, wind] = df['wind' + str(wind) + '_predict']
+            data_wind[:, wind] = df['wind' + str(wind) + '_predict'][(index_u_l_predict * 24):((index_u_l_predict + 1) * 24)].to_numpy()
         predict_load = data_load[:, u_select[:num_groups]].reshape((-1,))
         predict_wind = data_wind[:, u_select[num_groups:]].reshape((-1,))
 
