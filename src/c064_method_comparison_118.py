@@ -15,7 +15,7 @@ parameter = Case().case118_parameter()
 parameter_epsilon0 = Case().case118_parameter(epsilon=0)
 parameter_smallMaxIter = Case().case118_parameter(MaxIter=20)
 
-weight_optimize = np.loadtxt('./data/processed/weight118/strategies/n6_weight_test0Proposed.txt')
+weight_optimize = np.loadtxt('./data/processed/weight118/strategies/n5_weight_test0Proposed.txt') # 10
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
 for index_u_l_predict in index_u_l_predict_set:
