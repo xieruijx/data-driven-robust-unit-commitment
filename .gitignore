@@ -3,3 +3,4 @@ data/temp/
 results/
 src/utils/__pycache__/
 src/c012_data_processing_renewable.py
+.vscode/

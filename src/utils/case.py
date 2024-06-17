@@ -201,13 +201,14 @@ class Case(object):
         #	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_agc	ramp_10	ramp_30	ramp_q	apf ramp
         mpc['gen'] = np.concatenate((mpc['gen'], mpc['gen'][:, 8].reshape((-1, 1)) * 0.5), axis=1)
 
-        mpc['UTDT'] = 1
+        mpc['UTDT'] = 2
 
         #	2	startup	shutdown	n	c(n-1)	...	c0 reserve-up reserve-down ramp-up ramp-down
         mpc['gencost'] = np.concatenate((mpc['gencost'], np.full((mpc['gencost'].shape[0], 4), 0)), axis=1)
         mpc['gencost'][:, 5] = mpc['gencost'][:, 4] * mpc['gen'][:, 8] + mpc['gencost'][:, 5]
         mpc['gencost'][:, 4] = 0
         mpc['gencost'][:, 9] = mpc['gencost'][:, 5]
+        mpc['gencost'][:, 7] = 5
 
         #   branch
         mpc['branch'][:, 5] = np.ones(mpc['branch'][:, 5].shape) * mpc['baseMVA']
@@ -228,7 +229,7 @@ class Case(object):
         for i in range(len(bus_uncertain_load)):
             times_uncertain_load[i] = mpc['bus'][bus_uncertain_load[i] - 1, 2] / mpc['baseMVA']
             mpc['bus'][bus_uncertain_load[i] - 1, 2] = 0
-        times_uncertain_wind = - 100 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
+        times_uncertain_wind = - 29 * np.ones((len(bus_uncertain_wind),)) / mpc['baseMVA']
         mpc['times_uncertain'] = np.concatenate((times_uncertain_load, times_uncertain_wind))
 
         mpc['u_l_predict'] = parameter['u_l_predict'][:, mpc['u_select']].reshape((-1,))

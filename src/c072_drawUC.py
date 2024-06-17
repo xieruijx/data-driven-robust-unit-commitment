@@ -12,7 +12,7 @@ fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(9, 5))
 
 for index_unit, ax in enumerate(axs.flatten()):
 
-    x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.read_strategy(30, index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/')
+    x_og, x_pg, x_rp, x_rn, y_rp, y_rn = IO.read_strategy(index_u_l_predict, type_u_l, name_method='P2', folder_strategies='./results/strategies/30/')
     x_pg = x_pg * 100
     x_rp = x_rp * 100
     x_rn = x_rn * 100

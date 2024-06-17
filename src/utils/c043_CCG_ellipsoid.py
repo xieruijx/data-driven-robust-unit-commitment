@@ -109,7 +109,7 @@ class C043(object):
             Iter = 0
 
             ## Iteration
-            while True:
+            while Iter < MaxIter:
                 print('**************************************************************')
                 print('Begin iteration: {}'.format(Iter))
 
@@ -386,7 +386,7 @@ class C043(object):
             Iter = 0
 
             ## Iteration
-            while True:
+            while Iter < MaxIter:
                 print('**************************************************************')
                 print('Begin iteration: {}'.format(Iter))
 
@@ -473,6 +473,8 @@ class C043(object):
         u_data = u_data_train
         num_data = u_data.shape[0]
         for i in range(num_data):
+            if Iter >= MaxIter:
+                break
             try:
                 ## Test feasibility of points
                 fmodel = gp.Model('Feasibility')
