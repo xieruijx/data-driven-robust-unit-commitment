@@ -104,10 +104,10 @@ class IO(object):
 
                 index_matrix = index_matrix + 1
         
-        np.savetxt(folder_outputs + 'matrix_load.txt', matrix_load)
-        np.savetxt(folder_outputs + 'matrix_wind.txt', matrix_wind)
-        np.savetxt(folder_outputs + 'matrix_weight.txt', matrix_weight)
-        np.savetxt(folder_outputs + 'matrix_cost.txt', matrix_cost)
+        np.save(folder_outputs + 'matrix_load.npy', matrix_load)
+        np.save(folder_outputs + 'matrix_wind.npy', matrix_wind)
+        np.save(folder_outputs + 'matrix_weight.npy', matrix_weight)
+        np.save(folder_outputs + 'matrix_cost.npy', matrix_cost)
         return matrix_load, matrix_wind, matrix_weight, matrix_cost
 
     @staticmethod

@@ -23,7 +23,7 @@ high = 1
 with open(file_numbers, 'r') as f:
     numbers = [int(line.strip()) for line in f]
 
-while all(number < num_sample for number in numbers):
+while np.min(np.array(numbers)) < num_sample:
     # Find the first group of data that is not enough
     for index_u_l_predict, number in enumerate(numbers):
         if number < num_sample:
