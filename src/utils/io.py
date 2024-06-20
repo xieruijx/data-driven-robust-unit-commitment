@@ -91,9 +91,12 @@ class IO(object):
         matrix_wind = np.zeros((24 * sum(u_select[num_groups:]), sum_numbers))
         matrix_weight = np.zeros((2, sum_numbers))
         matrix_cost = np.zeros((sum_numbers,))
+        matrix_cost_normalized = np.zeros((sum_numbers,))
 
         index_matrix = 0
         for index_u_l_predict in range(len(numbers)):
+            average = 0
+            num_average = 0
             for index_sample in range(numbers[index_u_l_predict]):
                 predict_load, predict_wind, weight, cost = IO().read_training_sample(index_u_l_predict, type_u_l, index_sample, u_select, epsilon=epsilon, name_method=name_method, folder_outputs=folder_outputs, folder_strategies=folder_strategies, num_groups=num_groups, num_wind=num_wind)
 
@@ -101,14 +104,21 @@ class IO(object):
                 matrix_wind[:, index_matrix] = predict_wind
                 matrix_weight[:, index_matrix] = weight
                 matrix_cost[index_matrix] = cost
+                if not np.isinf(cost):
+                    average = average + cost
+                    num_average = num_average + 1
 
                 index_matrix = index_matrix + 1
+            if num_average > 0:
+                average = average / num_average
+            matrix_cost_normalized[(index_matrix - numbers[index_u_l_predict]):index_matrix] = matrix_cost[(index_matrix - numbers[index_u_l_predict]):index_matrix] - average
         
         np.save(folder_outputs + 'matrix_load.npy', matrix_load)
         np.save(folder_outputs + 'matrix_wind.npy', matrix_wind)
         np.save(folder_outputs + 'matrix_weight.npy', matrix_weight)
         np.save(folder_outputs + 'matrix_cost.npy', matrix_cost)
-        return matrix_load, matrix_wind, matrix_weight, matrix_cost
+        np.save(folder_outputs + 'matrix_cost_normalized.npy', matrix_cost_normalized)
+        return matrix_load, matrix_wind, matrix_weight, matrix_cost, matrix_cost_normalized
 
     @staticmethod
     def read_training_sample(index_u_l_predict, type_u_l, index_sample, u_select, epsilon=0.05, name_method='', folder_outputs='./data/processed/weight/outputs/', folder_strategies='./data/processed/weight/strategies/', num_groups=21, num_wind=4):
@@ -185,3 +195,15 @@ class IO(object):
         df.to_csv(folder_outputs + 'outputs_' + type_u_l + str(index_u_l_predict) + '.csv')
         return df
     
+    @staticmethod
+    def to_pca(X, folder_outputs):
+        """
+        Use PCA coefficients to transform matrix X, where rows are samples
+        """
+        scaler_mean = np.load(folder_outputs + 'scaler_mean.npy')
+        scaler_scale = np.load(folder_outputs + 'scaler_scale.npy')
+        pca_components = np.load(folder_outputs + 'pca_components.npy')
+
+        result = ((X - scaler_mean) / scaler_scale) @ pca_components.T
+        np.save(folder_outputs + 'matrix_pca.npy', result)
+        return result
