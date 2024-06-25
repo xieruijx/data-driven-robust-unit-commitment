@@ -207,3 +207,37 @@ class IO(object):
         result = ((X - scaler_mean) / scaler_scale) @ pca_components.T
         np.save(folder_outputs + 'matrix_pca.npy', result)
         return result
+    
+    @staticmethod
+    def output_param_model(param_model, folder_outputs):
+        """
+        Save the parameters of trained model into files
+        """
+        np.save(folder_outputs + 'num_layers.npy', np.array(param_model['num_layers']).astype(int))
+        for i in range(param_model['num_layers'] + 1):
+            np.save(folder_outputs + 'weight' + str(i) + '.npy', param_model['weight' + str(i)])
+            np.save(folder_outputs + 'bias' + str(i) + '.npy', param_model['bias' + str(i)])
+
+    @staticmethod
+    def read_param_model(folder_outputs):
+        """
+        Read the parameters of the trained model from files
+        """
+        param_model = {}
+        param_model['num_layers'] = np.load(folder_outputs + 'num_layers.npy')
+        for i in range(param_model['num_layers'] + 1):
+            param_model['weight' + str(i)] = np.load(folder_outputs + 'weight' + str(i) + '.npy')
+            param_model['bias' + str(i)] = np.load(folder_outputs + 'bias' + str(i) + '.npy')
+        return param_model
+    
+    @staticmethod
+    def NN_ReLU(param_model, input):
+        """
+        Compute the output of the ReLU-based neural network
+        """
+        medium = input
+        for i in range(param_model['num_layers']):
+            medium = param_model['weight' + str(i)] @ medium + param_model['bias' + str(i)]
+            medium = np.maximum(medium, 0)
+        output = param_model['weight' + str(param_model['num_layers'])] @ medium + param_model['bias' + str(param_model['num_layers'])]
+        return output
