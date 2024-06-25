@@ -44,21 +44,25 @@ matrix_pca = matrix_pca[:, :num_pca]
 matrix_weight = np.load(folder_outputs + 'matrix_weight.npy')
 X = np.concatenate((matrix_pca, matrix_weight.T), axis=1)
 
-matrix_cost = np.load(folder_outputs + 'matrix_cost.npy').reshape((-1, 1))
-X = X[matrix_cost[:, 0] < float('inf'), :]
-y = matrix_cost[matrix_cost[:, 0] < float('inf'), :]
+# matrix_cost = np.load(folder_outputs + 'matrix_cost.npy').reshape((-1, 1))
+# X = X[matrix_cost[:, 0] < float('inf'), :]
+# y = matrix_cost[matrix_cost[:, 0] < float('inf'), :]
 
-# matrix_cost_normalized = np.load(folder_outputs + 'matrix_cost_normalized.npy').reshape((-1, 1))
-# X = X[matrix_cost_normalized[:, 0] < float('inf'), :]
-# y = matrix_cost_normalized[matrix_cost_normalized[:, 0] < float('inf'), :]
+matrix_cost_normalized = np.load(folder_outputs + 'matrix_cost_normalized.npy').reshape((-1, 1))
+X = X[matrix_cost_normalized[:, 0] < float('inf'), :]
+y = matrix_cost_normalized[matrix_cost_normalized[:, 0] < float('inf'), :]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 X_scaler = StandardScaler()
 X_train = X_scaler.fit_transform(X_train)
+np.save(folder_outputs + 'X_scaler_mean.npy', X_scaler.mean_)
+np.save(folder_outputs + 'X_scaler_scale.npy', X_scaler.scale_)
 X_test = X_scaler.transform(X_test)
 y_scaler = StandardScaler()
 y_train = y_scaler.fit_transform(y_train)
+np.save(folder_outputs + 'y_scaler_mean.npy', y_scaler.mean_)
+np.save(folder_outputs + 'y_scaler_scale.npy', y_scaler.scale_)
 y_test = y_scaler.transform(y_test)
 
 X_train = torch.from_numpy(X_train).float()

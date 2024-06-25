@@ -125,7 +125,20 @@ class IO(object):
         """
         Read one training sample
         """
+        predict_load, predict_wind = IO().read_test_sample(index_u_l_predict, type_u_l, u_select, num_groups, num_wind)
 
+        weight = np.loadtxt(folder_strategies + 'n' + str(index_sample) + '_weight_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')[:2]
+
+        cost = np.loadtxt(folder_outputs + 'n' + str(index_sample) + '_validation_cost_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
+        cost = cost[np.argsort(cost)[np.ceil((1 - epsilon) * cost.shape[0]).astype(int) - 1]]
+
+        return predict_load, predict_wind, weight, cost
+        
+    @staticmethod
+    def read_test_sample(index_u_l_predict, type_u_l, u_select, num_groups=21, num_wind=4):
+        """
+        Read one test sample
+        """
         data_load = np.zeros((24, num_groups, 3))
         data_wind = np.zeros((24, num_wind))
         df = pd.read_csv('./data/processed/combination/d031_' + type_u_l + '.csv')
@@ -138,12 +151,7 @@ class IO(object):
         predict_load = data_load[:, u_select[:num_groups]].reshape((-1,))
         predict_wind = data_wind[:, u_select[num_groups:]].reshape((-1,))
 
-        weight = np.loadtxt(folder_strategies + 'n' + str(index_sample) + '_weight_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')[:2]
-
-        cost = np.loadtxt(folder_outputs + 'n' + str(index_sample) + '_validation_cost_' + type_u_l + str(index_u_l_predict) + name_method + '.txt')
-        cost = cost[np.argsort(cost)[np.ceil((1 - epsilon) * cost.shape[0]).astype(int) - 1]]
-
-        return predict_load, predict_wind, weight, cost
+        return predict_load, predict_wind
     
     @staticmethod
     def organize_method(index_u_l_predict, type_u_l, epsilon=0.05, name_method='', folder_outputs='./results/outputs/'):
