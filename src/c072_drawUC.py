@@ -6,7 +6,7 @@ from utils.io import IO
 index_u_l_predict = 16
 type_u_l = 'test'
 num_unit = 6
-type_method = 'P2'
+type_method = 'Proposed'
 
 fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(9, 5))
 

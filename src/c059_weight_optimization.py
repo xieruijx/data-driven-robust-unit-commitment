@@ -56,3 +56,7 @@ MILP.addConstr(gp.quicksum(input[num_pca:]) <= 1)
 MILP.addConstr(p[0] == (input - X_scaler_mean) / X_scaler_scale)
 MILP.optimize()
 print(input.X)
+weight = np.zeros((3, 1))
+weight[:2, 0] = input.X[num_pca:]
+weight[2, 0] = 1 - np.sum(weight[:2])
+np.savetxt('./data/processed/combination/d059_weight.txt', weight)

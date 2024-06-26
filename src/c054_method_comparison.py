@@ -8,14 +8,14 @@ from utils.io import IO
 optimization = Optimization()
 
 ## Settings
-index_u_l_predict_set = range(31, 100)
+index_u_l_predict_set = [16]
 type_u_l = 'test'
 
 parameter = Case().case_ieee30_parameter()
 parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
 
-# weight_optimize = np.loadtxt('./data/processed/weight/index_9_weight_56.txt')
-weight_optimize = np.loadtxt('./data/processed/combination/d032_weight.txt')
+# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
+weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
 for index_u_l_predict in index_u_l_predict_set:
