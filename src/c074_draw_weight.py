@@ -16,6 +16,9 @@ num_pca = 3
 folder_outputs = './data/processed/weight/outputs/'
 parameter = Case().case_ieee30_parameter()
 
+# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
+weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
+
 X_scaler_mean = np.load(folder_outputs + 'X_scaler_mean.npy')
 X_scaler_scale = np.load(folder_outputs + 'X_scaler_scale.npy')
 y_scaler_mean = np.load(folder_outputs + 'y_scaler_mean.npy')
@@ -37,14 +40,36 @@ for i in range(num_points):
         cost = IO().NN_ReLU(param_model=param_model, input=input).reshape(())
         c[i, j] = cost * y_scaler_scale[0] + y_scaler_mean[0]
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-norm = plt.Normalize(c.min(), c.max())
-colors = plt.cm.viridis(norm(c))
-rcount, ccount, _ = colors.shape
-surf = ax.plot_surface(w0, w1, c, linewidth=0, antialiased=False, rcount=rcount, ccount=ccount, facecolors=colors, shade=False)
-ax.set_xlabel('w0')
-ax.set_ylabel('w1')
-ax.set_zlabel('c')
+z = c + 88700
+labelsize = None
+fontsize = 12
 
+fig = plt.figure()
+fig.set_figheight(4)
+fig.set_figwidth(6)
+ax1 = fig.add_subplot(121, projection='3d')
+norm = plt.Normalize(c.min(), c.max())
+colors = plt.cm.plasma(norm(c))
+rcount, ccount, _ = colors.shape
+surf = ax1.plot_surface(w0, w1, z, linewidth=0, antialiased=False, rcount=rcount, ccount=ccount, facecolors=colors, shade=False)
+ax1.tick_params(axis='x', labelsize=labelsize)
+ax1.tick_params(axis='y', labelsize=labelsize)
+ax1.tick_params(axis='z', labelsize=labelsize)
+ax1.set_xlabel('$w^{(0)}$', fontsize=fontsize)
+ax1.set_ylabel('$w^{(1)}$', fontsize=fontsize)
+ax1.set_zlabel('Total cost (\$)', fontsize=fontsize)
+
+ax2 = fig.add_subplot(122)
+ax2.fill_between([0, 1], [0, 0], [1, 0], label='$\mathcal{W}$',
+                    color='gray', alpha=0.15)
+cset = ax2.contour(w0, w1, z, cmap=plt.get_cmap('plasma'))
+ax2.scatter(weight_optimize[0], weight_optimize[1], c='k', s=40, marker='*', label='Optimal weight')
+ax2.tick_params(axis='x', labelsize=labelsize)
+ax2.tick_params(axis='y', labelsize=labelsize)
+ax2.set_xlabel('$w^{(0)}$', fontsize=fontsize)
+ax2.set_ylabel('$w^{(1)}$', fontsize=fontsize)
+ax2.clabel(cset, fontsize=labelsize)
+ax2.legend()
+
+plt.tight_layout()
 plt.show()

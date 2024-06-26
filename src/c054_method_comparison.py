@@ -32,16 +32,16 @@ for index_u_l_predict in index_u_l_predict_set:
     IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'Proposed', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
 
     ## RO_max: The data-driven RO method using the 100% ellipsoidal uncertainty set
-    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n_m', None, index_u_l_predict, 'case_ieee30', type_u_l)
-    IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_max', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
+    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_error, 'n_m', None, index_u_l_predict, 'case_ieee30', type_u_l)
+    IO().output_UC(index_u_l_predict, type_u_l, weight_error, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_max', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
 
     ## RO_quantile: The data-driven RO method using the 1 - epsilon ellipsoidal uncertainty set
-    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n_q', None, index_u_l_predict, 'case_ieee30', type_u_l)
-    IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_quantile', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
+    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_error, 'n_q', None, index_u_l_predict, 'case_ieee30', type_u_l)
+    IO().output_UC(index_u_l_predict, type_u_l, weight_error, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'RO_quantile', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
 
     ## SP_approx: The data-driven SP method using approximate method to solve
-    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_optimize, 'n1', 'approx', index_u_l_predict, 'case_ieee30', type_u_l)
-    IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'SP_approx', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
+    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter, weight_error, 'n1', 'approx', index_u_l_predict, 'case_ieee30', type_u_l)
+    IO().output_UC(index_u_l_predict, type_u_l, weight_error, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'SP_approx', folder_outputs='./results/outputs/30/', folder_strategies='./results/strategies/30/')
 
     ## Organize and compare
     IO().organize_methods(index_u_l_predict, type_u_l, 0.05, folder_outputs='./results/outputs/30/')

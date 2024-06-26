@@ -31,13 +31,16 @@ x_p1 = np.append(vertices1[:, 0], vertices1[0, 0])
 y_p1 = np.append(vertices1[:, 1], vertices1[0, 1])
 
 # Plotting:
+
+linewidth = 2.2
+
 fig, ax = plt.subplots(1, 1)
-ax.plot(points[:, 0], points[:, 1], 'k.', ms=2)
-ax.plot(x_e, y_ep, 'g', label='Ellipsoid 1')
-ax.plot(x_e, y_en, 'g')
-ax.plot(x_p0, y_p0, label='Polyhedron 1')
-ax.plot(x_w, y_w, 'gs', label='Worst case')
-ax.plot(x_p1, y_p1, 'r--', label='Polyhedron 2')
+ax.scatter(points[:, 0], points[:, 1], s=10, color='gray', alpha=0.25)
+ax.plot(x_e, y_ep, c='#73AC39', linewidth=linewidth, label='Ellipsoid 1')
+ax.plot(x_e, y_en, c='#73AC39', linewidth=linewidth)
+ax.scatter(x_w, y_w, c='#3973AC', marker='*', s=70, label='Worst case', zorder=20)
+ax.plot(x_p0, y_p0, c='#BFBF40', linestyle='dashed', linewidth=linewidth, label='Polyhedron 1')
+ax.plot(x_p1, y_p1, c='#BF8040', linestyle='dashdot', linewidth=linewidth, label='Polyhedron 2')
 ax.legend()
 
 ax.set_aspect('equal')
