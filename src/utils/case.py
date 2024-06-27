@@ -128,7 +128,7 @@ class Case(object):
         return mpc
     
     @staticmethod
-    def case_ieee30_parameter(b_faster=False, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1):
+    def case_ieee30_parameter(b_faster=False, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1, delta=0.05):
         """
         Parameters for the IEEE 30-bus unit commitment computation
         """
@@ -139,7 +139,7 @@ class Case(object):
         parameter['num_wind'] = 4
         parameter['horizon'] = 24
         parameter['epsilon'] = epsilon # chance constraint parameter
-        parameter['delta'] = 0.05 # probability guarantee parameter
+        parameter['delta'] = delta # probability guarantee parameter
         parameter['MaxIter'] = MaxIter # Maximum iteration number of CCG
         parameter['LargeNumber'] = 1e8 # For the big-M method
         parameter['Tolerance'] = 1e-3 # Tolerance: UB - LB <= Tolerance * UB
@@ -249,7 +249,7 @@ class Case(object):
         return mpc
     
     @staticmethod
-    def case118_parameter(b_faster=True, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1):
+    def case118_parameter(b_faster=True, b_display_SP=False, epsilon=0.05, MaxIter=100, TimeLimit=1, delta=0.05):
         """
         Parameters for the IEEE 30-bus unit commitment computation
         """
@@ -260,7 +260,7 @@ class Case(object):
         parameter['num_wind'] = 4
         parameter['horizon'] = 24
         parameter['epsilon'] = epsilon # chance constraint parameter
-        parameter['delta'] = 0.05 # probability guarantee parameter
+        parameter['delta'] = delta # probability guarantee parameter
         parameter['MaxIter'] = MaxIter # Maximum iteration number of CCG
         parameter['LargeNumber'] = 1e12 # For the big-M method
         parameter['Tolerance'] = 1e-3 # Tolerance: UB - LB <= Tolerance * UB
