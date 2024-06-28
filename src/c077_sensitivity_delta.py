@@ -13,8 +13,10 @@ optimization = Optimization()
 ## Settings
 index_u_l_predict = 16
 type_u_l = 'test'
-set_delta = np.array([0, 0.001, 0.007, 0.027, 0.077, 0.167])
+# set_delta = np.array([0, 0.002, 0.014, 0.050, 0.128, 0.253])
+set_delta = np.array([0, 0.050, 0.128, 0.253])
 num_delta = set_delta.shape[0]
+TimeLimit = 1
 # weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 folder_outputs = './results/outputs/30/'
@@ -33,7 +35,7 @@ for i in range(num_delta):
 
 ## Computation
 for i in range(num_delta):
-    parameter_delta = Case().case_ieee30_parameter(delta=set_delta[i])
+    parameter_delta = Case().case_ieee30_parameter(delta=set_delta[i], TimeLimit=TimeLimit)
 
     validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_delta, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
 
@@ -69,11 +71,9 @@ print(df[['delta', 'test quantile', 'test rate', 'cost', 'objective']])
 fontsize = 12
 
 fig, ax = plt.subplots(1, 2, figsize=(7, 3))
-ax[0].plot(df['delta'], df['cost'], 'o--', label='Total cost')
-ax[0].plot(df['delta'], df['objective'], 's-.', label='Objective')
-ax[0].set_ylabel('Cost (\$)', fontsize=fontsize)
+ax[0].plot(df['delta'], df['objective']+69, 'o-', label='Objective')
+ax[0].set_ylabel('Objective (\$)', fontsize=fontsize)
 ax[0].set_xlabel('$\delta$', fontsize=fontsize)
-ax[0].legend()
 ax[0].grid(linestyle='--')
 ax[1].plot(df['delta'], df['test rate'], 'o-')
 ax[1].set_xlabel('$\delta$', fontsize=fontsize)

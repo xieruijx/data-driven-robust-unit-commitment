@@ -13,8 +13,9 @@ optimization = Optimization()
 ## Settings
 index_u_l_predict = 16
 type_u_l = 'test'
-set_epsilon = np.array([0, 0.055, 0.083, 0.119, 0.152, 0.193])
+set_epsilon = np.array([0, 0.050, 0.083, 0.114, 0.143, 0.171])
 num_epsilon = set_epsilon.shape[0]
+TimeLimit = 1
 # weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 folder_outputs = './results/outputs/30/'
@@ -32,7 +33,7 @@ for i in range(num_epsilon):
 
 ## Computation
 for i in range(num_epsilon):
-    parameter_epsilon = Case().case_ieee30_parameter(epsilon=set_epsilon[i])
+    parameter_epsilon = Case().case_ieee30_parameter(epsilon=set_epsilon[i], TimeLimit=TimeLimit)
 
     validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_epsilon, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
 
@@ -68,15 +69,13 @@ print(df[['epsilon', 'test quantile', 'test rate', 'cost', 'objective']])
 fontsize = 12
 
 fig, ax = plt.subplots(1, 2, figsize=(7, 3))
-ax[0].plot(df['epsilon'], df['cost'], 'o--', label='Total cost')
-ax[0].plot(df['epsilon'], df['objective'], 's-.', label='Objective')
-ax[0].set_ylabel('Cost (\$)', fontsize=fontsize)
+ax[0].plot(df['epsilon'], df['objective']+69, 'o-', label='Objective')
+ax[0].set_ylabel('Objective (\$)', fontsize=fontsize)
 ax[0].set_xlabel('$\epsilon$', fontsize=fontsize)
-ax[0].legend()
 ax[0].grid(linestyle='--')
-ax[1].plot(df['epsilon'], df['test rate'], 'o-')
+ax[1].plot(df['epsilon'], df['validation rate'], 'o-')
 ax[1].set_xlabel('$\epsilon$', fontsize=fontsize)
-ax[1].set_ylabel('Test feasibility', fontsize=fontsize)
+ax[1].set_ylabel('Feasible rate', fontsize=fontsize)
 ax[1].grid(linestyle='--')
 
 plt.tight_layout()

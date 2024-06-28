@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from utils.combhandler import CombHandler
 
 # Settings
-N0 = 140
+N0 = 124
 epsilon0 = 0.05
 delta0 = 0.05
 
@@ -42,11 +42,11 @@ ax[0].set_title('$\epsilon = \delta = 0.05$', fontsize=fontsize)
 ax[0].grid(linestyle='--')
 ax[1].plot(set_epsilon, - set_rank_epsilon + N0, '-')
 ax[1].set_xlabel('$\epsilon$', fontsize=fontsize)
-ax[1].set_title('$N_2 = 140, \delta = 0.05$', fontsize=fontsize)
+ax[1].set_title('$N_2 = 124, \delta = 0.05$', fontsize=fontsize)
 ax[1].grid(linestyle='--')
 ax[2].plot(set_delta, - set_rank_delta + N0, '-')
 ax[2].set_xlabel('$\delta$', fontsize=fontsize)
-ax[2].set_title('$N_2 = 140, \epsilon = 0.05$', fontsize=fontsize)
+ax[2].set_title('$N_2 = 124, \epsilon = 0.05$', fontsize=fontsize)
 ax[2].grid(linestyle='--')
 
 plt.tight_layout()

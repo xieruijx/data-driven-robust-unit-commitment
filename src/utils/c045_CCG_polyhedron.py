@@ -74,6 +74,9 @@ class C045(object):
                 MP.addConstr(zetaMP >= Cry @ yMPdata[i, :], name='rcd')
                 MP.addConstr(Areu @ u_data[i, :] + Arexc @ xcMP + Arey @ yMPdata[i, :] == Bre, name='red')
                 MP.addConstr(Arixc @ xcMP + Ariy @ yMPdata[i, :] >= Bri, name='rid')
+            # MP.addConstr(zetaMP >= Cry @ yMPdata[0, :], name='rcd')
+            # MP.addConstr(Areu @ u_data[0, :] + Arexc @ xcMP + Arey @ yMPdata[0, :] == Bre, name='red')
+            # MP.addConstr(Arixc @ xcMP + Ariy @ yMPdata[0, :] >= Bri, name='rid')
             MP.setParam('OutputFlag', 0) 
 
             # Feasibility check problem by mountain climbing
