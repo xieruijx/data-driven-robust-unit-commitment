@@ -8,7 +8,9 @@ type_u_l = 'test'
 num_unit = 6
 type_method = 'Proposed'
 
-fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(9, 5))
+fontsize = 12
+
+fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(9, 5))
 
 for index_unit, ax in enumerate(axs.flatten()):
 
@@ -27,10 +29,11 @@ for index_unit, ax in enumerate(axs.flatten()):
     ax.plot(time, x_pg[:, index_unit] + y_rp[:, index_unit] - y_rn[:, index_unit], 'g2-', label='Re-dispatch')
 
     if index_unit == 0:
-        ax.legend()
+        ax.legend(fontsize=fontsize)
 
-    ax.set_xlabel('Time (h)')
-    ax.set_ylabel('Power of unit ' + str(index_unit + 1) + ' (MW)')
+    ax.set_xlabel('Time (h)', fontsize=fontsize)
+    ax.set_ylabel('Power of unit ' + str(index_unit + 1) + ' (MW)', fontsize=fontsize)
     ax.grid(linestyle='--')
 
+plt.tight_layout()
 plt.show()
