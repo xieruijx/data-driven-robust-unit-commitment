@@ -33,13 +33,13 @@ for i in range(num_delta):
     if not os.path.isdir(set_folder_strategies[i]):
         os.mkdir(set_folder_strategies[i])
 
-## Computation
-for i in range(num_delta):
-    parameter_delta = Case().case_ieee30_parameter(delta=set_delta[i], TimeLimit=TimeLimit)
+# ## Computation
+# for i in range(num_delta):
+#     parameter_delta = Case().case_ieee30_parameter(delta=set_delta[i], TimeLimit=TimeLimit)
 
-    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_delta, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
+#     validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_delta, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
 
-    IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'Proposed', folder_outputs=set_folder_outputs[i], folder_strategies=set_folder_strategies[i])
+#     IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'Proposed', folder_outputs=set_folder_outputs[i], folder_strategies=set_folder_strategies[i])
 
 ## Organize
 outputs = {}
@@ -77,7 +77,7 @@ ax[0].set_xlabel('$\delta$', fontsize=fontsize)
 ax[0].grid(linestyle='--')
 ax[1].plot(df['delta'], df['test rate'], 'o-')
 ax[1].set_xlabel('$\delta$', fontsize=fontsize)
-ax[1].set_ylabel('Test feasibility', fontsize=fontsize)
+ax[1].set_ylabel('Feasible rate', fontsize=fontsize)
 ax[1].grid(linestyle='--')
 
 plt.tight_layout()

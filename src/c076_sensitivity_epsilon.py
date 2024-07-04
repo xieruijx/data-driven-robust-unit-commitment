@@ -31,13 +31,13 @@ for i in range(num_epsilon):
     if not os.path.isdir(set_folder_strategies[i]):
         os.mkdir(set_folder_strategies[i])
 
-## Computation
-for i in range(num_epsilon):
-    parameter_epsilon = Case().case_ieee30_parameter(epsilon=set_epsilon[i], TimeLimit=TimeLimit)
+# ## Computation
+# for i in range(num_epsilon):
+#     parameter_epsilon = Case().case_ieee30_parameter(epsilon=set_epsilon[i], TimeLimit=TimeLimit)
 
-    validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_epsilon, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
+#     validation_cost, test_cost, sxb1, sxc1, LBUB1, sxb2, sxc2, LBUB2, time, train_cost, train_order, interpret = optimization.weight2cost(parameter_epsilon, weight_optimize, 'n1', None, index_u_l_predict, 'case_ieee30', type_u_l)
 
-    IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'Proposed', folder_outputs=set_folder_outputs[i], folder_strategies=set_folder_strategies[i])
+#     IO().output_UC(index_u_l_predict, type_u_l, weight_optimize, train_cost, train_order, validation_cost, test_cost, LBUB1, LBUB2, time, interpret, 'Proposed', folder_outputs=set_folder_outputs[i], folder_strategies=set_folder_strategies[i])
 
 ## Organize
 outputs = {}

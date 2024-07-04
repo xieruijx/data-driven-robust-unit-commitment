@@ -9,7 +9,7 @@ N0 = 124
 epsilon0 = 0.05
 delta0 = 0.05
 
-set_N = np.arange(1, 501, 1)
+set_N = np.arange(1, 3001, 1)
 set_rank_N = np.zeros(set_N.shape)
 for i in range(set_N.shape[0]):
     set_rank_N[i] = CombHandler().get_rank(set_N[i], epsilon0, delta0)
@@ -34,20 +34,23 @@ for i in range(set_delta.shape[0]):
 
 fontsize = 12
 
-fig, ax = plt.subplots(1, 3, figsize=(7, 3))
-ax[0].plot(set_N, set_N - set_rank_N, '-')
-ax[0].set_ylabel('Number of points outside', fontsize=fontsize)
-ax[0].set_xlabel('$N_2$', fontsize=fontsize)
-ax[0].set_title('$\epsilon = \delta = 0.05$', fontsize=fontsize)
-ax[0].grid(linestyle='--')
-ax[1].plot(set_epsilon, - set_rank_epsilon + N0, '-')
-ax[1].set_xlabel('$\epsilon$', fontsize=fontsize)
-ax[1].set_title('$N_2 = 124, \delta = 0.05$', fontsize=fontsize)
-ax[1].grid(linestyle='--')
-ax[2].plot(set_delta, - set_rank_delta + N0, '-')
-ax[2].set_xlabel('$\delta$', fontsize=fontsize)
-ax[2].set_title('$N_2 = 124, \epsilon = 0.05$', fontsize=fontsize)
-ax[2].grid(linestyle='--')
+fig, ax = plt.subplots(2, 2, figsize=(7, 5))
+ax[0, 0].plot(set_N[:500], set_N[:500] - set_rank_N[:500], '-')
+ax[0, 0].set_ylabel('Number of points outside', fontsize=fontsize)
+ax[0, 0].set_xlabel('$N_2$', fontsize=fontsize)
+ax[0, 0].grid(linestyle='--')
+ax[0, 1].plot(set_N, (set_N - set_rank_N) / set_N, '-')
+ax[0, 1].set_ylabel('Proportion of points outside', fontsize=fontsize)
+ax[0, 1].set_xlabel('$N_2$', fontsize=fontsize)
+ax[0, 1].grid(linestyle='--')
+ax[1, 0].plot(set_epsilon, (- set_rank_epsilon + N0) / N0, '-')
+ax[1, 0].set_ylabel('Proportion of points outside', fontsize=fontsize)
+ax[1, 0].set_xlabel('$\epsilon$', fontsize=fontsize)
+ax[1, 0].grid(linestyle='--')
+ax[1, 1].plot(set_delta, (- set_rank_delta + N0) / N0, '-')
+ax[1, 1].set_ylabel('Proportion of points outside', fontsize=fontsize)
+ax[1, 1].set_xlabel('$\delta$', fontsize=fontsize)
+ax[1, 1].grid(linestyle='--')
+fig.tight_layout()
 
-plt.tight_layout()
 plt.show()
