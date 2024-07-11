@@ -16,7 +16,6 @@ num_pca = 3
 folder_outputs = './data/processed/weight/outputs/'
 parameter = Case().case_ieee30_parameter()
 
-# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 
 X_scaler_mean = np.load(folder_outputs + 'X_scaler_mean.npy')

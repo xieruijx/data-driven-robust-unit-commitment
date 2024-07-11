@@ -16,7 +16,6 @@ type_u_l = 'test'
 set_epsilon = np.array([0, 0.050, 0.083, 0.114, 0.143, 0.171])
 num_epsilon = set_epsilon.shape[0]
 TimeLimit = 1
-# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 folder_outputs = './results/outputs/30/'
 folder_strategies = './results/strategies/30/'

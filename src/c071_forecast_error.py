@@ -40,9 +40,6 @@ for group in range(num_groups):
     predict_VFL[:, :, group] = np.reshape(df['prediction'][index_begin:(index_begin + horizon * num_test)], (num_sample, horizon))
 VFL_errors = EM.errors(predict_VFL, real)
 VFL_errors_mean = EM.errors_mean(predict_VFL, real)
-# predict_VFL1 = 0.4 * predict_local + 0.6 * predict_VFL
-# VFL_errors = EM.errors(predict_VFL1, real)
-# VFL_errors_mean = EM.errors_mean(predict_VFL1, real)
 
 # Method: naive
 predict_naive = np.zeros((num_sample, horizon, num_groups))

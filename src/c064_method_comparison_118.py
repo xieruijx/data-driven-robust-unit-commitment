@@ -41,4 +41,3 @@ for index_u_l_predict in index_u_l_predict_set:
 
     ## Organize and compare
     IO().organize_methods(index_u_l_predict, type_u_l, 0.05, folder_outputs='./results/outputs/118/')
-    # IO().organize_methods(index_u_l_predict, type_u_l, 0.05, folder_outputs='./results/outputs/118/', methods=['P1', 'P2', 'RO_max', 'RO_quantile'])

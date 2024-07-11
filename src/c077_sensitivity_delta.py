@@ -13,11 +13,9 @@ optimization = Optimization()
 ## Settings
 index_u_l_predict = 16
 type_u_l = 'test'
-# set_delta = np.array([0, 0.002, 0.014, 0.050, 0.128, 0.253])
 set_delta = np.array([0, 0.050, 0.128, 0.253])
 num_delta = set_delta.shape[0]
 TimeLimit = 1
-# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 folder_outputs = './results/outputs/30/'
 folder_strategies = './results/strategies/30/'

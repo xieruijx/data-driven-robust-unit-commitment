@@ -14,7 +14,6 @@ type_u_l = 'test'
 parameter = Case().case_ieee30_parameter()
 parameter_epsilon0 = Case().case_ieee30_parameter(epsilon=0)
 
-# weight_optimize = np.loadtxt('./data/processed/combination/d059_weight.txt')
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
