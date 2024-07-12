@@ -67,15 +67,17 @@ print(df[['epsilon', 'test quantile', 'test rate', 'cost', 'objective']])
 ## Draw
 fontsize = 12
 
-fig, ax = plt.subplots(1, 2, figsize=(7, 3))
+fig, ax = plt.subplots(1, 2, figsize=(7, 2.2))
 ax[0].plot(df['epsilon'], df['objective']+69, 'o-', label='Objective')
 ax[0].set_ylabel('Objective (\$)', fontsize=fontsize)
 ax[0].set_xlabel('$\epsilon$', fontsize=fontsize)
 ax[0].grid(linestyle='--')
+ax[0].set_ylim((88500, 90000))
 ax[1].plot(df['epsilon'], df['validation rate'], 'o-')
 ax[1].set_xlabel('$\epsilon$', fontsize=fontsize)
 ax[1].set_ylabel('Feasible rate', fontsize=fontsize)
 ax[1].grid(linestyle='--')
+ax[1].set_ylim((0.85, 1))
 
 plt.tight_layout()
 plt.show()
