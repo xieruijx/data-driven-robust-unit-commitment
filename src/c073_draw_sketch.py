@@ -38,10 +38,10 @@ fig, ax = plt.subplots(1, 1)
 ax.scatter(points[:, 0], points[:, 1], s=10, color='gray', alpha=0.25)
 ax.plot(x_e, y_ep, c='#73AC39', linewidth=linewidth, label='Ellipsoid 1')
 ax.plot(x_e, y_en, c='#73AC39', linewidth=linewidth)
-ax.scatter(x_w, y_w, c='#3973AC', marker='*', s=70, label='Worst case', zorder=20)
+ax.scatter(x_w, y_w, c='#3973AC', marker='*', s=70, label='Worst-case scenario', zorder=20)
 ax.plot(x_p0, y_p0, c='#BFBF40', linestyle='dashed', linewidth=linewidth, label='Polyhedron 1')
 ax.plot(x_p1, y_p1, c='#BF8040', linestyle='dashdot', linewidth=linewidth, label='Polyhedron 2')
-ax.legend()
+ax.legend(loc=(-0.18, 0.55))
 
 ax.set_aspect('equal')
 
@@ -57,4 +57,5 @@ ax.set_xlim([-2.3, 1.7])
 ax.set_ylim([-2, 2])
 
 # Finally, show the plot:
+# plt.tight_layout()
 plt.show()

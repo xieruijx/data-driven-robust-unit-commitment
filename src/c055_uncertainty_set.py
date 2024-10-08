@@ -129,8 +129,8 @@ ax.legend()
 ax.set_aspect('equal')
 
 # Set the labels for the x and y axes:
-ax.set_xlabel("First dimension (MW)", fontsize=fontsize)
-ax.set_ylabel("Second dimension (MW)", fontsize=fontsize)
+ax.set_xlabel("The first dimension (MW)", fontsize=fontsize)
+ax.set_ylabel("The second dimension (MW)", fontsize=fontsize)
 
 ax.grid(linestyle='--')
 
