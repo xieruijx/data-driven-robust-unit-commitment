@@ -42,8 +42,10 @@ class Project(object):
         basis = np.zeros((dim_u, dim_u))
         basis[:2, :] = Eu
         basis_element = [0, 0]
-        basis_element[0] = np.nonzero(Eu[0, :])[0][0]
-        basis_element[1] = np.nonzero(Eu[1, :] - Eu[0, :] * Eu[1, basis_element[0]] / Eu[0, basis_element[0]])[0][0]
+        basis_element[0] = np.nonzero(Eu[0, :])[0][0] # The first nonzero index
+        temp = Eu[1, :] - Eu[0, :] * Eu[1, basis_element[0]] / Eu[0, basis_element[0]]
+        temp[np.abs(temp) < 1e-10] = 0
+        basis_element[1] = np.nonzero(temp)[0][0]
         element = 2
         for i in range(dim_u):
             if i == basis_element[0] or i == basis_element[1]:
@@ -96,7 +98,7 @@ class Project(object):
     @staticmethod
     def ineq_norm(pA, pB):
         """
-        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Input the 2-dimensional compact polyhedron expressed by pA p >= pB
         Normalize pA
         """
         pAnorm = np.sqrt(pA[:, 0] * pA[:, 0] + pA[:, 1] * pA[:, 1])
@@ -108,7 +110,7 @@ class Project(object):
     @staticmethod
     def ineq_polyhedron(pA, pB):
         """
-        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Input the 2-dimensional compact polyhedron expressed by pA p >= pB
         Delete the abundant constraint
         Output pA p >= pB
         """
