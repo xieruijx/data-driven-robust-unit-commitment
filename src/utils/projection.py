@@ -81,19 +81,44 @@ class Project(object):
         Eup = np.maximum(Eu, 0)
         Eun = np.minimum(Eu, 0)
 
-        lb = Eup @ ul + Eun @ uu
-        ub = Eup @ uu + Eun @ ul
+        pmin = Eup @ ul + Eun @ uu
+        pmax = Eup @ uu + Eun @ ul
 
-        xlx = np.array([lb[0], lb[0]])
-        xly = np.array([lb[1], ub[1]])
-        xux = np.array([ub[0], ub[0]])
-        xuy = np.array([lb[1], ub[1]])
-        ylx = np.array([lb[0], ub[0]])
-        yly = np.array([lb[1], lb[1]])
-        yux = np.array([lb[0], ub[0]])
-        yuy = np.array([ub[1], ub[1]])
+        pA = np.array([[1, 0],
+                       [0, 1],
+                       [-1, 0],
+                       [0, -1]]) # pA p >= pB
+        pB = np.array([pmin[0], pmin[1], -pmax[0], -pmax[1]])
+        
+        while True:
+            pA, pB = Project().ineq_polyhedron(pA, pB)
+            vertices = Project().ineq2vertex(pA, pB)
 
-        return xlx, xly, xux, xuy, ylx, yly, yux, yuy, lb, ub
+            num_v = len(vertices)
+            distance = 0
+            xv = vertices[0, :]
+            v = vertices[0, :]
+            for i in range(num_v):
+                m = gp.Model('m')
+                u = m.addMVar((ul.shape[0],), lb=-float('inf'), vtype=GRB.CONTINUOUS)
+                m.addConstr(u <= uu)
+                m.addConstr(u >= ul)
+                m.setObjective(gp.quicksum((Eu @ u - vertices[i, :]) * (Eu @ u - vertices[i, :])), GRB.MINIMIZE)
+                m.setParam('OutputFlag', 0) 
+                m.optimize()
+                if m.ObjVal > distance:
+                    xv = Eu @ u.X
+                    v = vertices[i, :]
+                    distance = m.ObjVal
+            if distance < 1e-4:
+                break
+            a = xv - v
+            a = a / np.sqrt(np.sum(a * a))
+            pA = np.concatenate((pA, a.reshape((1, 2))), axis=0)
+            pB = np.append(pB, a @ xv)
+            print(distance)
+
+        return vertices, ul, uu, pmin, pmax
     
     @staticmethod
     def ineq_norm(pA, pB):
@@ -139,7 +164,7 @@ class Project(object):
     @staticmethod
     def ineq2vertex(pA, pB):
         """
-        Input the 2-dimentional compact polyhedron expressed by pA p >= pB
+        Input the 2-dimensional compact polyhedron expressed by pA p >= pB
         Output the vertices in shape (-1, 2)
         No abundant constraint
         """
@@ -171,18 +196,13 @@ class Project(object):
         return vertices
 
     @staticmethod
-    def projection_polyhedron(coefficients, pmin, pmax, Eu):
+    def projection_polyhedron(coefficients, pmin, pmax, ul, uu, Eu):
         """
         Project the multi-dimensional polyhedron to a two-dimensional polyhedron
         """
-        Aueu = coefficients['Aueu']
-        Auey = coefficients['Auey']
-        Auiy = coefficients['Auiy']
-        Bue = coefficients['Bue']
-        Bui = coefficients['Bui']
 
-        dim_u = Aueu.shape[1]
-        dim_y = Auey.shape[1]
+        dim_u = coefficients['Aueu'].shape[1]
+        dim_y = coefficients['Auey'].shape[1]
 
         pA = np.array([[1, 0],
                        [0, 1],
@@ -202,8 +222,10 @@ class Project(object):
                 m = gp.Model('m')
                 u = m.addMVar((dim_u,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
                 y = m.addMVar((dim_y,), lb=-float('inf'), vtype=GRB.CONTINUOUS)
-                m.addConstr(Aueu @ u + Auey @ y == Bue, name='e')
-                m.addConstr(Auiy @ y >= Bui, name='i')
+                m.addConstr(u <= uu)
+                m.addConstr(u >= ul)
+                m.addConstr(coefficients['Aueu'] @ u + coefficients['Auey'] @ y == coefficients['Bue'], name='e')
+                m.addConstr(coefficients['Auiy'] @ y >= coefficients['Bui'], name='i')
                 m.setObjective(gp.quicksum((Eu @ u - vertices[i, :]) * (Eu @ u - vertices[i, :])), GRB.MINIMIZE)
                 m.setParam('OutputFlag', 0) 
                 m.optimize()
@@ -211,7 +233,7 @@ class Project(object):
                     xv = Eu @ u.X
                     v = vertices[i, :]
                     distance = m.ObjVal
-            if distance < 1e-6:
+            if distance < 1e-4:
                 break
             a = xv - v
             a = a / np.sqrt(np.sum(a * a))

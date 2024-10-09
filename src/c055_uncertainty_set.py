@@ -6,7 +6,7 @@ from utils.optimization import Optimization
 from utils.case import Case
 from utils.projection import Project
 
-np.random.seed(4)
+np.random.seed(0)
 
 optimization = Optimization()
 
@@ -30,8 +30,8 @@ parameter_epsilon0['u_select'] = [False, True, True, False, False, False, False,
 # parameter_epsilon0['TimeLimitSP'] = 100 # Time limit of the subproblem
 
 Eu = np.zeros((2, sum(parameter['u_select']) * parameter['horizon']))
-Eu[0, 0:10:2] = 1
-Eu[1, 1:10:2] = 1
+# Eu[0, 0:10:2] = 1
+# Eu[1, 1:10:2] = 1
 worst_u_RO1 = np.load('./data/temp/worst_u_RO1.npy')
 worst_u_RO2 = np.load('./data/temp/worst_u_RO2.npy')
 worst_u_P1 = np.load('./data/temp/worst_u_P1.npy')
@@ -45,19 +45,22 @@ Eu_Proposed1 = (worst_u_Proposed1 - error_mu) / np.linalg.norm(worst_u_Proposed1
 Eu_Proposed2 = (worst_u_Proposed2 - error_mu) / np.linalg.norm(worst_u_Proposed2 - error_mu)
 Euold = Eu
 # Eu[0, :] = 2.0109 * Euold[0, :] - 0.6350 * Euold[1, :]
-Eu[1, :] = 0.6350 * Euold[0, :] + 2.0109 * Euold[1, :]
+# Eu[1, :] = 0.6350 * Euold[0, :] + 2.0109 * Euold[1, :]
+Eu[1, :12] = 1
 Eu[0, :] = Eu_RO1
-# Eu[0, :] = np.random.rand(sum(parameter['u_select']) * parameter['horizon'])
-# Eu[1, :] = np.random.rand(sum(parameter['u_select']) * parameter['horizon'])
-# Eu[0, :] = Eu[0, :] / np.linalg.norm(Eu[0, :])
-# Eu[1, :] = Eu[1, :] / np.linalg.norm(Eu[1, :])
+# Eu[0, :] = np.random.rand(sum(parameter['u_select']) * parameter['horizon']) - 0.5
+# Eu[1, :] = np.random.rand(sum(parameter['u_select']) * parameter['horizon']) - 0.5
+Eu[0, :] = Eu[0, :] / np.linalg.norm(Eu[0, :])
+Eu[1, :] = Eu[1, :] / np.linalg.norm(Eu[1, :])
 
 weight_optimize = np.loadtxt('./data/processed/combination/d053_weight.txt')
 weight_error = np.loadtxt('./data/processed/combination/d032_weight.txt')
 
 ## Upper and lower bounds under the common weight
 error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_error, 'n2', index_u_l_predict, 'case_ieee30', type_u_l)
-xlx, xly, xux, xuy, ylx, yly, yux, yuy, pmin, pmax = Project().projection_bound(error_lb, error_ub, u_lu, u_ll, u_l_predict, Eu)
+vertices, ul, uu, pmin, pmax = Project().projection_bound(error_lb, error_ub, u_lu, u_ll, u_l_predict, Eu)
+x_bound = np.append(vertices[:, 0], vertices[0, 0])
+y_bound = np.append(vertices[:, 1], vertices[0, 1])
 
 # ## The first uncertainty set of Proposed
 # error_mu, error_sigma, error_rho, u_l_predict, error_lb, error_ub, u_lu, u_ll = optimization.weight2ellipsoid(parameter, weight_optimize, 'n1', index_u_l_predict, 'case_ieee30', type_u_l)
@@ -160,43 +163,38 @@ coefficients['Auey'] = np.load('./data/temp/Auey_P2.npy')
 coefficients['Auiy'] = np.load('./data/temp/Auiy_P2.npy')
 coefficients['Bue'] = np.load('./data/temp/Bue_P2.npy')
 coefficients['Bui'] = np.load('./data/temp/Bui_P2.npy')
-vertices = Project().projection_polyhedron(coefficients, pmin, pmax, Eu)
+vertices = Project().projection_polyhedron(coefficients, pmin, pmax, ul, uu, Eu)
 x_P2 = np.append(vertices[:, 0], vertices[0, 0])
 y_P2 = np.append(vertices[:, 1], vertices[0, 1])
-print(x_P2)
-print(y_P2)
 
 fontsize = 12
 # Plotting:
 fig, ax = plt.subplots(1, 1)
-ax.plot(xlx * 100, xly * 100, 'k', label="Bound")
-ax.plot(xux * 100, xuy * 100, 'k')
-ax.plot(ylx * 100, yly * 100, 'k')
-ax.plot(yux * 100, yuy * 100, 'k')
+ax.plot(x_bound * 100, y_bound * 100, 'k', label="$U_0$")
 ax.plot(x_RO_max * 100, yp_RO_max * 100, 'g', label="RO1")
 ax.plot(x_RO_max * 100, yn_RO_max * 100, 'g')
 worst_project_RO1 = Eu @ worst_u_RO1
-print(worst_project_RO1)
-ax.scatter(worst_project_RO1[0] * 100, worst_project_RO1[1] * 100, c='g', marker='*', s=70)
+ax.scatter(worst_project_RO1[0] * 100, worst_project_RO1[1] * 100, c='g', marker='*', s=70, zorder = 100)
+ax.annotate('142360', (worst_project_RO1[0] * 100, worst_project_RO1[1] * 100), c='g', textcoords="offset points", xytext=(0,20), ha='center', zorder = 100)
 ax.plot(x_RO_quantile * 100, yp_RO_quantile * 100, 'b', label="RO2")
 ax.plot(x_RO_quantile * 100, yn_RO_quantile * 100, 'b')
 worst_project_RO2 = Eu @ worst_u_RO2
-print(worst_project_RO2)
-ax.scatter(worst_project_RO2[0] * 100, worst_project_RO2[1] * 100, c='b', marker='*', s=70)
+ax.scatter(worst_project_RO2[0] * 100, worst_project_RO2[1] * 100, c='b', marker='*', s=70, zorder = 100)
+ax.annotate('141972', (worst_project_RO2[0] * 100, worst_project_RO2[1] * 100), c='b', textcoords="offset points", xytext=(-25,-3), ha='center', zorder = 100)
 ax.plot(x_P1 * 100, yp_P1 * 100, 'r', label="P1")
 ax.plot(x_P1 * 100, yn_P1 * 100, 'r')
 worst_project_P1 = Eu @ worst_u_P1
-print(worst_project_P1)
-ax.scatter(worst_project_P1[0] * 100, worst_project_P1[1] * 100, c='r', marker='*', s=70)
-ax.plot(x_P21 * 100, yp_P21 * 100, 'y', label='Proposed_1')
-ax.plot(x_P21 * 100, yn_P21 * 100, 'y')
+ax.scatter(worst_project_P1[0] * 100, worst_project_P1[1] * 100, c='r', marker='*', s=70, zorder = 100)
+ax.annotate('142199', (worst_project_P1[0] * 100, worst_project_P1[1] * 100), c='r', textcoords="offset points", xytext=(3,-15), ha='center', zorder = 100)
+ax.plot(x_P21 * 100, yp_P21 * 100, 'm', label='Proposed_1')
+ax.plot(x_P21 * 100, yn_P21 * 100, 'm')
 worst_project_Proposed1 = Eu @ worst_u_Proposed1
-print(worst_project_Proposed1)
-ax.scatter(worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100, c='y', marker='*', s=70)
+ax.scatter(worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100, c='m', marker='*', s=70, zorder = 100)
+ax.annotate('142247', (worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100), c='m', textcoords="offset points", xytext=(25,-5), ha='center', zorder = 100)
 ax.plot(x_P2 * 100, y_P2 * 100, 'c', label='Proposed_2')
 worst_project_Proposed2 = Eu @ worst_u_Proposed2
-print(worst_project_Proposed2)
-ax.scatter(worst_project_Proposed2[0] * 100, worst_project_Proposed2[1] * 100, c='c', marker='*', s=70)
+ax.scatter(worst_project_Proposed2[0] * 100, worst_project_Proposed2[1] * 100, c='c', marker='*', s=70, zorder = 100)
+ax.annotate('141654', (worst_project_Proposed2[0] * 100, worst_project_Proposed2[1] * 100), c='c', textcoords="offset points", xytext=(0,-15), ha='center', zorder = 100)
 # ax.plot(x_Proposed1 * 100, yp_Proposed1 * 100, 'c', label='Proposed_1')
 # ax.plot(x_Proposed1 * 100, yn_Proposed1 * 100, 'c')
 # ax.plot(x_Proposed2 * 100, y_Proposed2 * 100, label='Proposed_2')
