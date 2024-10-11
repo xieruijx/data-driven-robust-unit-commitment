@@ -171,8 +171,10 @@ fontsize = 12
 # Plotting:
 fig, ax = plt.subplots(1, 1)
 ax.plot(x_bound * 100, y_bound * 100, 'k', label="$U_0$")
-ax.plot(x_RO_max * 100, yp_RO_max * 100, 'g', label="RO1")
-ax.plot(x_RO_max * 100, yn_RO_max * 100, 'g')
+index = x_RO_max < 4.87
+ax.plot(x_RO_max[index] * 100, yp_RO_max[index] * 100, 'g', label="RO1")
+index = x_RO_max < 4.80
+ax.plot(x_RO_max[index] * 100, yn_RO_max[index] * 100, 'g')
 worst_project_RO1 = Eu @ worst_u_RO1
 ax.scatter(worst_project_RO1[0] * 100, worst_project_RO1[1] * 100, c='g', marker='*', s=70, zorder = 100)
 ax.annotate('142360', (worst_project_RO1[0] * 100, worst_project_RO1[1] * 100), c='g', textcoords="offset points", xytext=(0,20), ha='center', zorder = 100)
@@ -180,17 +182,19 @@ ax.plot(x_RO_quantile * 100, yp_RO_quantile * 100, 'b', label="RO2")
 ax.plot(x_RO_quantile * 100, yn_RO_quantile * 100, 'b')
 worst_project_RO2 = Eu @ worst_u_RO2
 ax.scatter(worst_project_RO2[0] * 100, worst_project_RO2[1] * 100, c='b', marker='*', s=70, zorder = 100)
-ax.annotate('141972', (worst_project_RO2[0] * 100, worst_project_RO2[1] * 100), c='b', textcoords="offset points", xytext=(-25,-3), ha='center', zorder = 100)
+ax.annotate('141972', (worst_project_RO2[0] * 100, worst_project_RO2[1] * 100), c='b', textcoords="offset points", xytext=(-22,-3), ha='center', zorder = 100)
 ax.plot(x_P1 * 100, yp_P1 * 100, 'r', label="P1")
 ax.plot(x_P1 * 100, yn_P1 * 100, 'r')
 worst_project_P1 = Eu @ worst_u_P1
 ax.scatter(worst_project_P1[0] * 100, worst_project_P1[1] * 100, c='r', marker='*', s=70, zorder = 100)
-ax.annotate('142199', (worst_project_P1[0] * 100, worst_project_P1[1] * 100), c='r', textcoords="offset points", xytext=(3,-15), ha='center', zorder = 100)
-ax.plot(x_P21 * 100, yp_P21 * 100, 'm', label='Proposed_1')
-ax.plot(x_P21 * 100, yn_P21 * 100, 'm')
+ax.annotate('142199', (worst_project_P1[0] * 100, worst_project_P1[1] * 100), c='r', textcoords="offset points", xytext=(-4,-17), ha='center', zorder = 100)
+index = x_P21 < 4.85
+ax.plot(x_P21[index] * 100, yp_P21[index] * 100, 'm', label='Proposed_1')
+index = x_P21 < 4.81
+ax.plot(x_P21[index] * 100, yn_P21[index] * 100, 'm')
 worst_project_Proposed1 = Eu @ worst_u_Proposed1
 ax.scatter(worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100, c='m', marker='*', s=70, zorder = 100)
-ax.annotate('142247', (worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100), c='m', textcoords="offset points", xytext=(25,-5), ha='center', zorder = 100)
+ax.annotate('142247', (worst_project_Proposed1[0] * 100, worst_project_Proposed1[1] * 100), c='m', textcoords="offset points", xytext=(24,-5), ha='center', zorder = 100)
 ax.plot(x_P2 * 100, y_P2 * 100, 'c', label='Proposed_2')
 worst_project_Proposed2 = Eu @ worst_u_Proposed2
 ax.scatter(worst_project_Proposed2[0] * 100, worst_project_Proposed2[1] * 100, c='c', marker='*', s=70, zorder = 100)
